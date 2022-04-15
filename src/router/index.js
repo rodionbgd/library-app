@@ -20,7 +20,7 @@ const routes = [
 
 export const path =
   // eslint-disable-next-line no-undef
-  process.env.NODE_ENV === "production" ? "/library/" : "/";
+  process.env.NODE_ENV === "production" ? "/library-app/" : "./";
 
 const router = createRouter({
   history: createWebHistory(path),
