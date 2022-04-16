@@ -8,8 +8,6 @@
 </template>
 
 <script setup>
-import AppLink from "@/components/AppLink.vue";
-
 const props = defineProps({
   item: {
     type: Object,

@@ -12,6 +12,12 @@ const routes = [
     component: () => import("@/views/AuthorsView.vue"),
   },
   {
+    path: "/author/:id",
+    name: "author",
+    component: () => import("@/views/AuthorView.vue"),
+    props: (route) => ({ ...route.params, id: parseInt(route.params.id) }),
+  },
+  {
     path: "/about",
     name: "About",
     component: () => import("@/views/AuthorsView.vue"),

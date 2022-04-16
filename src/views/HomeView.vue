@@ -19,7 +19,7 @@
           </button>
         </div>
       </div>
-      <div class="row tm-row book-list">
+      <div class="row tm-row book-list tm-mt-8r">
         <BookItem
           v-for="book in booksCurrentPage"
           :key="book.id"
@@ -99,12 +99,6 @@ const hasPrev = computed(() => {
 </script>
 
 <style scoped>
-.book-list {
-  margin-top: 8rem;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-}
-
 .page-nav {
   top: 4rem;
   width: 100%;

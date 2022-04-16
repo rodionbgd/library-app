@@ -36,7 +36,6 @@
 
 <script setup>
 import { reactive } from "vue";
-import AppLink from "@/components/AppLink.vue";
 import MenuItem from "@/components/MenuItem.vue";
 
 const data = reactive({
