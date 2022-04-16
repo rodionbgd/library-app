@@ -1,1 +1,0 @@
-import{e as n,o as t,c as e,F as u,r as c,u as l,h as p,t as i}from"./index.14a6d846.js";const f={setup(m){const r=p(),s=n(()=>r.state.authors);return(_,h)=>(t(),e("div",null,[(t(!0),e(u,null,c(l(s),(a,o)=>(t(),e("h2",{key:o},i(a),1))),128))]))}};export{f as default};
