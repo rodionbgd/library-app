@@ -25,6 +25,15 @@ export const path =
 const router = createRouter({
   history: createWebHistory(path),
   routes,
+  scrollBehavior(to, from, savedPosition) {
+    return (
+      savedPosition ||
+      (to.fullPath !== from.fullPath &&
+        new Promise((resolve) =>
+          setTimeout(() => resolve({ top: 0, behavior: "smooth" }), 200)
+        ))
+    );
+  },
 });
 
 export default router;

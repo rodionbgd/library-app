@@ -1,5 +1,7 @@
 <template>
-  <h2 v-for="(author, index) in authors" :key="index">{{ author }}</h2>
+  <div>
+    <h2 v-for="(author, index) in authors" :key="index">{{ author }}</h2>
+  </div>
 </template>
 
 <script setup>

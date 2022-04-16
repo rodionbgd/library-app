@@ -3,7 +3,11 @@
   <AppHeader />
   <div class="container-fluid">
     <main class="tm-main">
-      <router-view :key="route.path"></router-view>
+      <router-view v-slot="{ Component, route }">
+        <transition name="fade" mode="out-in">
+          <component :is="Component" :key="route.path" />
+        </transition>
+      </router-view>
     </main>
   </div>
 </template>
@@ -13,10 +17,8 @@ import AppHeader from "@/components/AppHeader.vue";
 import SearchInput from "@/components/SearchInput.vue";
 import { useStore } from "vuex";
 import { onMounted } from "vue";
-import { useRoute } from "vue-router";
 
 const store = useStore();
-const route = useRoute();
 onMounted(() => {
   store.dispatch("getBooks");
 });
@@ -38,5 +40,14 @@ body {
 
 p {
   color: #999;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.3s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
