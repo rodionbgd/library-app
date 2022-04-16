@@ -1,1 +1,0 @@
-import{e as n,o as t,c as e,r as u,u as c,F as p,h as l,t as m}from"./index.70498187.js";const d={setup(_){const r=l(),s=n(()=>r.state.authors);return(h,i)=>(t(!0),e(p,null,u(c(s),(a,o)=>(t(),e("h2",{key:o},m(a),1))),128))}};export{d as default};
