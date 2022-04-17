@@ -15,6 +15,7 @@ const store = createStore({
     },
     GET_AUTHORS(state) {
       let id = 1;
+      state.authors = [];
       state.books?.forEach((book) =>
         book.authors?.forEach((author) => {
           const hasAuthor = state.authors.find(
@@ -33,17 +34,27 @@ const store = createStore({
         author1.name.localeCompare(author2.name)
       );
     },
+    REMOVE_BOOK(state, payload) {
+      state.books = state.books.filter((book) => book.id !== payload.id);
+    },
   },
 
   actions: {
-    async getBooks({ commit, state }) {
-      if (!state.books.length) {
-        let books = await getBooks(1);
+    async getBooks({ commit }) {
+      let books;
+      const pages = [1, 2];
+      for (let i of pages) {
+        books = await getBooks(i);
         commit("GET_BOOKS", books);
-        books = await getBooks(2);
-        commit("GET_BOOKS", books);
-        commit("GET_AUTHORS");
       }
+      commit("GET_AUTHORS");
+    },
+    removeBook({ commit }, book) {
+      if (!book) {
+        return;
+      }
+      commit("REMOVE_BOOK", book);
+      commit("GET_AUTHORS");
     },
   },
 });

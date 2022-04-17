@@ -19,11 +19,12 @@
           </button>
         </div>
       </div>
-      <div class="row tm-row book-list tm-mt-8r">
+      <div class="row tm-row book-list tm-mt-6r">
         <BookItem
           v-for="book in booksCurrentPage"
           :key="book.id"
           :book="book"
+          @remove-book="removeBook"
         />
       </div>
     </div>
@@ -33,7 +34,6 @@
 
 <script setup>
 import BookItem from "@/components/BookItem.vue";
-
 import { computed, onMounted, reactive, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
@@ -66,6 +66,7 @@ const booksCurrentPage = computed(() => {
   const end = data.currentPage * booksPerPage;
   return [...books.value].slice(start, end);
 });
+
 const updateRoute = () => {
   router.push({
     name: "home",
@@ -96,6 +97,14 @@ const hasNext = computed(() => {
 const hasPrev = computed(() => {
   return data.currentPage > 1;
 });
+
+const removeBook = (book) => {
+  store.dispatch("removeBook", book);
+  if (maxPage.value < data.currentPage) {
+    data.currentPage = maxPage.value;
+    updateRoute();
+  }
+};
 </script>
 
 <style scoped>

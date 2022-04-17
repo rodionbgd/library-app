@@ -1,6 +1,14 @@
 <template>
   <section>
     <div class="card">
+      <div class="position-relative edit-bar">
+        <button class="edit-btn" @click="editBook">
+          <i class="fa-regular fa-pen-to-square"></i>
+        </button>
+        <button class="edit-btn" @click="removeBook">
+          <i class="fa-regular fa-trash-can"></i>
+        </button>
+      </div>
       <img
         class="image cover"
         :src="props.book.formats['image/jpeg']"
@@ -26,6 +34,10 @@
 </template>
 
 <script setup>
+import { useStore } from "vuex";
+import { ref } from "vue";
+
+const store = useStore();
 const props = defineProps({
   book: {
     type: Object,
@@ -37,15 +49,63 @@ const props = defineProps({
     }),
   },
 });
+
+const events = defineEmits({
+  "remove-book": null,
+});
+
+const isEdit = ref(false);
+
+const removeBook = () => {
+  events("remove-book", props.book);
+  store.dispatch("removeBook", props.book);
+};
+
+const editBook = () => {
+  isEdit.value = true;
+};
 </script>
 
 <style scoped>
-img {
-  max-width: 100%;
+section {
+  padding: 1.5em 0.5rem;
 }
 
-section {
-  padding: 2.5em 0.5rem;
+section .edit-bar {
+  visibility: hidden;
+  top: 7rem;
+  margin: 0 auto;
+  z-index: 1;
+}
+
+section:hover .edit-bar {
+  visibility: visible;
+}
+
+.edit-btn {
+  font-size: 1.5rem;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 50%;
+  width: 3rem;
+  height: 3rem;
+  padding: 0.5rem 10px 10px;
+  background: #099;
+  color: white;
+  border: none;
+  opacity: 0.7;
+}
+
+.edit-btn + .edit-btn {
+  margin-left: 0.25rem;
+}
+.edit-btn:hover {
+  display: inline-block;
+  opacity: 1;
+}
+
+img {
+  max-width: 100%;
 }
 
 .card {
@@ -112,18 +172,16 @@ section {
 .card .image.cover {
   position: relative;
   display: block;
-  height: 225px;
-  width: 150px;
-  margin-right: auto;
-  margin-left: auto;
+  height: 15rem;
+  width: 10rem;
+  margin: 0 auto;
   box-shadow: 0.25em 0.35em 1em rgba(0, 0, 0, 0.6);
 }
 
 @media (min-width: 600px) {
   .card .image.cover {
     display: inline-block;
-    margin-top: -2em;
-    margin-right: 0.825em;
+    margin: -4em auto 0;
     vertical-align: top;
   }
 }

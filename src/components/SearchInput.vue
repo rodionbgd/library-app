@@ -21,7 +21,7 @@
 .search-input {
   width: 100%;
   position: fixed;
-  z-index: 1;
+  z-index: 5;
   background: white;
   display: inline-block;
   padding-right: 20%;

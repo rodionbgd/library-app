@@ -1,6 +1,9 @@
 <template>
-  <div class="row tm-row book-list">
-    <BookItem v-for="book in booksByAuthor" :key="book.id" :book="book" />
+  <div>
+    <p>Books by {{ props.name }}</p>
+    <div class="row tm-row book-list">
+      <BookItem v-for="book in booksByAuthor" :key="book.id" :book="book" />
+    </div>
   </div>
 </template>
 
