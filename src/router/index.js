@@ -53,7 +53,7 @@ const routes = [
 ];
 
 export const path =
-  import.meta.env.NODE_ENV === "production" ? "/library-app/" : "./";
+  process.env.NODE_ENV === "production" ? "/library-app/" : "./";
 
 const router = createRouter({
   history: createWebHistory(path),
