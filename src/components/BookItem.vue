@@ -1,10 +1,17 @@
 <template>
   <section>
     <div class="card">
-      <div class="position-relative edit-bar">
-        <button class="edit-btn" @click="editBook">
-          <i class="fa-regular fa-pen-to-square"></i>
-        </button>
+      <div class="d-flex position-relative edit-bar">
+        <app-link
+          :to="{
+            name: routeName,
+            params: { bookId: props.book.id },
+          }"
+        >
+          <button class="edit-btn">
+            <i class="fa-regular fa-pen-to-square"></i>
+          </button>
+        </app-link>
         <button class="edit-btn" @click="removeBook">
           <i class="fa-regular fa-trash-can"></i>
         </button>
@@ -35,7 +42,6 @@
 
 <script setup>
 import { useStore } from "vuex";
-import { ref } from "vue";
 
 const store = useStore();
 const props = defineProps({
@@ -48,21 +54,19 @@ const props = defineProps({
       title: "",
     }),
   },
+  routeName: {
+    type: String,
+    default: "edit-book",
+  },
 });
 
 const events = defineEmits({
   "remove-book": null,
 });
 
-const isEdit = ref(false);
-
 const removeBook = () => {
   events("remove-book", props.book);
   store.dispatch("removeBook", props.book);
-};
-
-const editBook = () => {
-  isEdit.value = true;
 };
 </script>
 
@@ -90,6 +94,8 @@ section:hover .edit-bar {
   width: 3rem;
   height: 3rem;
   padding: 0.5rem 10px 10px;
+  margin-left: 0.25rem;
+  margin-right: 0.25rem;
   background: #099;
   color: white;
   border: none;
@@ -99,6 +105,7 @@ section:hover .edit-bar {
 .edit-btn + .edit-btn {
   margin-left: 0.25rem;
 }
+
 .edit-btn:hover {
   display: inline-block;
   opacity: 1;

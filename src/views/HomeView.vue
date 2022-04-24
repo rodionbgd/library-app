@@ -1,5 +1,6 @@
 <template>
   <div>
+    <router-view />
     <div v-if="books.length">
       <div class="position-fixed row tm-row page-nav">
         <div class="tm-prev-next-wrapper">

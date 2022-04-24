@@ -1,10 +1,23 @@
 import { createRouter, createWebHistory } from "vue-router";
+import HomeView from "@/views/HomeView.vue";
 
 const routes = [
   {
     path: "/",
     name: "home",
-    component: () => import("@/views/HomeView.vue"),
+    component: HomeView,
+    meta: { transition: "" },
+    children: [
+      {
+        path: "edit/:bookId",
+        name: "edit-book",
+        component: () => import("@/views/EditBook.vue"),
+        props: (route) => ({
+          ...route.params,
+          bookId: parseInt(route.params.bookId),
+        }),
+      },
+    ],
   },
   {
     path: "/authors",
@@ -12,10 +25,25 @@ const routes = [
     component: () => import("@/views/AuthorsView.vue"),
   },
   {
-    path: "/author/:id",
+    path: "/author/:authorId",
     name: "author",
     component: () => import("@/views/AuthorView.vue"),
-    props: (route) => ({ ...route.params, id: parseInt(route.params.id) }),
+    props: (route) => ({
+      ...route.params,
+      authorId: parseInt(route.params.authorId),
+    }),
+    meta: { transition: "" },
+    children: [
+      {
+        path: "edit/:bookId",
+        name: "edit-book-author",
+        component: () => import("@/views/EditBook.vue"),
+        props: (route) => ({
+          ...route.params,
+          bookId: parseInt(route.params.bookId),
+        }),
+      },
+    ],
   },
   {
     path: "/about",
@@ -25,8 +53,7 @@ const routes = [
 ];
 
 export const path =
-  // eslint-disable-next-line no-undef
-  process.env.NODE_ENV === "production" ? "/library-app/" : "./";
+  import.meta.env.NODE_ENV === "production" ? "/library-app/" : "./";
 
 const router = createRouter({
   history: createWebHistory(path),
@@ -35,11 +62,12 @@ const router = createRouter({
     return (
       savedPosition ||
       (to.fullPath !== from.fullPath &&
+        from.name !== "edit-book" &&
+        to.name !== "edit-book" &&
         new Promise((resolve) =>
           setTimeout(() => resolve({ top: 0, behavior: "smooth" }), 200)
         ))
     );
   },
 });
-
 export default router;

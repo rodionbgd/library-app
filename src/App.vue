@@ -4,7 +4,7 @@
   <div class="container-fluid">
     <main class="tm-main">
       <router-view v-slot="{ Component, route }">
-        <transition name="fade" mode="out-in">
+        <transition :name="route.meta.transition ?? 'fade'" mode="out-in">
           <component :is="Component" :key="route.path" />
         </transition>
       </router-view>
@@ -46,7 +46,7 @@ p {
 .fade-leave-active {
   transition: all 0.3s;
 }
-.fade-enter,
+.fade-enter-from,
 .fade-leave-to {
   opacity: 0;
 }

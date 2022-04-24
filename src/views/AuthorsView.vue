@@ -10,11 +10,11 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="author in sortedAuthors" :key="author.name">
+        <tr v-for="author in sortedAuthors" :key="author.id">
           <app-link
             :to="{
               name: 'author',
-              params: { id: author.id, name: author.name },
+              params: { authorId: author.id },
             }"
           >
             <td>{{ author.name }}</td>

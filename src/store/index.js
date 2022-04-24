@@ -9,9 +9,28 @@ const store = createStore({
       authors: [],
     };
   },
+  getters: {
+    getAuthorBookById: (state, getters) => (id) => {
+      const authorById = getters.getAuthorById(id);
+      return state.books.filter((book) =>
+        book.authors.find((author) => author.name === authorById?.name)
+      );
+    },
+    getAuthorById: (state) => (id) => {
+      return state.authors.find((author) => author.id === id);
+    },
+  },
   mutations: {
     GET_BOOKS(state, payload) {
       state.books = [...state.books, ...payload];
+    },
+    UPDATE_BOOK(state, payload) {
+      let indexToUpdate = state.books.findIndex(
+        (book) => book.id === payload.id
+      );
+      if (indexToUpdate !== -1) {
+        state.books[indexToUpdate] = payload;
+      }
     },
     GET_AUTHORS(state) {
       let id = 1;
@@ -45,8 +64,16 @@ const store = createStore({
       const pages = [1, 2];
       for (let i of pages) {
         books = await getBooks(i);
+
         commit("GET_BOOKS", books);
       }
+      commit("GET_AUTHORS");
+    },
+    updateBook({ commit }, book) {
+      if (!book) {
+        return;
+      }
+      commit("UPDATE_BOOK", book);
       commit("GET_AUTHORS");
     },
     removeBook({ commit }, book) {
