@@ -5,7 +5,11 @@ export async function getBooks(page = 1) {
       console.error("Unable to fetch data");
     }
     const data = await response.json();
-    return data.results;
+    const books = data.results;
+    books.forEach((book) => {
+      book.rate = Math.ceil(Math.random() * 5);
+    });
+    return books;
   } catch (e) {
     console.error("Unable to fetch data");
     return [];

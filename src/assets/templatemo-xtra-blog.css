@@ -211,6 +211,7 @@ video {
     height: 45px;
     border-color: #0CC;
     border-radius: 0;
+    padding: 0.5rem;
 }
 
 .tm-comment-form { max-width: 360px; }

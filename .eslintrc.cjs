@@ -8,6 +8,10 @@ module.exports = {
     "eslint:recommended",
     "@vue/eslint-config-prettier"
   ],
+  rules: {
+    "no-console": ["error", { allow: ["warn", "error"] }],
+    "no-alert": "error",
+  },
   "env": {
     "node": true,
     "commonjs": true,
