@@ -20,6 +20,12 @@ const routes = [
     ],
   },
   {
+    path: "/add",
+    name: "add-book",
+    component: () => import("@/views/EditBook.vue"),
+    meta: { transition: "" },
+  },
+  {
     path: "/authors",
     name: "authors",
     component: () => import("@/views/AuthorsView.vue"),
@@ -59,15 +65,16 @@ const router = createRouter({
   history: createWebHistory(path),
   routes,
   scrollBehavior(to, from, savedPosition) {
-    return (
-      savedPosition ||
-      (to.fullPath !== from.fullPath &&
-        from.name !== "edit-book" &&
-        to.name !== "edit-book" &&
-        new Promise((resolve) =>
-          setTimeout(() => resolve({ top: 0, behavior: "smooth" }), 200)
-        ))
-    );
+    if (
+      to.fullPath !== from.fullPath &&
+      from.name !== "edit-book" &&
+      to.name !== "edit-book"
+    )
+      return new Promise((resolve) =>
+        setTimeout(() => resolve({ top: 0, behavior: "smooth" }), 200)
+      );
+    return savedPosition;
   },
 });
+
 export default router;

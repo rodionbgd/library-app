@@ -11,14 +11,16 @@
       </thead>
       <tbody>
         <tr v-for="author in sortedAuthors" :key="author.id">
-          <app-link
-            :to="{
-              name: 'author',
-              params: { authorId: author.id },
-            }"
-          >
-            <td>{{ author.name }}</td>
-          </app-link>
+          <td>
+            <app-link
+              :to="{
+                name: 'author',
+                params: { authorId: author.id },
+              }"
+            >
+              {{ author.name }}
+            </app-link>
+          </td>
           <td>{{ author.birth_year ? author.birth_year : "-" }}</td>
           <td>{{ author.death_year ? author.death_year : "-" }}</td>
           <td>{{ author.books }}</td>
@@ -65,6 +67,7 @@ table {
   border-collapse: collapse;
   width: 100%;
 }
+
 th,
 td {
   background: #fff;
@@ -75,9 +78,11 @@ th:hover {
   color: #00ccccaa;
   cursor: pointer;
 }
+
 tbody tr {
   border-top: 1px solid gray;
 }
+
 .tableWrapper {
   overflow: auto;
   height: 80vh;

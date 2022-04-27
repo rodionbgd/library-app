@@ -43,7 +43,7 @@
 
 <script setup>
 import RateStars from "@/components/UI/RateStars.vue";
-import { computed, nextTick, onBeforeUnmount, onMounted, reactive } from "vue";
+import { computed, onBeforeUnmount, onMounted, reactive } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 
@@ -51,8 +51,8 @@ const store = useStore();
 const router = useRouter();
 const props = defineProps({
   bookId: {
-    type: Number,
-    required: true,
+    type: [Number, undefined],
+    default: undefined,
   },
 });
 
@@ -65,13 +65,14 @@ const data = reactive({
   rate: 0,
   newAuthor: "",
   closeCounter: 0,
+  imgSrc: "",
 });
 
 onMounted(() => {
   document.body.addEventListener("keydown", closeByEsc);
-  data.title = book.value?.title;
-  data.rate = book.value?.rate;
-  data.authors = book.value?.authors.map((author) => author.name);
+  data.title = book.value?.title ?? "";
+  data.rate = book.value?.rate ?? 1;
+  data.authors = book.value?.authors.map((author) => author.name) ?? [];
 });
 
 onBeforeUnmount(() => {
@@ -98,12 +99,20 @@ const updateAuthorName = (event, authorIndex) => {
 const saveBook = () => {
   const authors = [];
   data.authors.forEach((author) => authors.push({ name: author }));
-  store.dispatch("updateBook", {
-    ...book.value,
-    authors,
-    title: data.title,
-    rate: data.rate,
-  });
+  if (!book.value) {
+    store.dispatch("addBook", {
+      authors,
+      title: data.title,
+      rate: data.rate,
+    });
+  } else {
+    store.dispatch("updateBook", {
+      ...book.value,
+      authors,
+      title: data.title,
+      rate: data.rate,
+    });
+  }
   close();
 };
 
@@ -112,7 +121,7 @@ const updateRate = (rate) => {
 };
 
 const close = () => {
-  nextTick(router.back);
+  router.back();
 };
 
 const closeByEsc = (e) => {

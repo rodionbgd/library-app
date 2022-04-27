@@ -26,9 +26,9 @@ const props = defineProps({
   },
 });
 
-const author = computed(() => store.getters.getAuthorById(props.authorId));
+const author = computed(() => store.getters.authorById(props.authorId));
 const booksByAuthor = computed(() =>
-  store.getters.getAuthorBookById(props.authorId)
+  store.getters.authorBookById(props.authorId)
 );
 </script>
 

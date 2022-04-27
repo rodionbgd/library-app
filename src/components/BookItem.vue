@@ -4,7 +4,7 @@
       <div class="d-flex position-relative edit-bar">
         <app-link
           :to="{
-            name: routeName,
+            name: props.routeName,
             params: { bookId: props.book.id },
           }"
         >
@@ -18,7 +18,7 @@
       </div>
       <img
         class="image cover"
-        :src="props.book.formats['image/jpeg']"
+        :src="props.book.formats['image/jpeg'] ?? ''"
         alt="Image"
       />
       <div class="book-info">
@@ -28,8 +28,16 @@
           v-for="author in props.book.authors"
           :key="author.name"
         >
-          {{ author.name }}
+          <app-link
+            :to="{
+              name: 'author',
+              params: { authorId: idByAuthorName(author.name) },
+            }"
+          >
+            {{ author.name }}
+          </app-link>
         </div>
+        <rate-stars :rate="props.book.rate" />
         <div class="bookshelf">
           <div v-for="bookshelf in props.book.bookshelves" :key="bookshelf">
             #{{ bookshelf }}
@@ -41,6 +49,7 @@
 </template>
 
 <script setup>
+import RateStars from "@/components/UI/RateStars.vue";
 import { useStore } from "vuex";
 
 const store = useStore();
@@ -52,6 +61,7 @@ const props = defineProps({
       authors: [],
       bookshelves: [],
       title: "",
+      rate: null,
     }),
   },
   routeName: {
@@ -63,6 +73,10 @@ const props = defineProps({
 const events = defineEmits({
   "remove-book": null,
 });
+
+const idByAuthorName = (name) => {
+  return store.state.authors?.find((author) => author.name === name)?.id;
+};
 
 const removeBook = () => {
   events("remove-book", props.book);

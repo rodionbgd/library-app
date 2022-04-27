@@ -8,14 +8,21 @@
         placeholder="Search..."
         aria-label="Search"
       />
-      <button class="tm-search-button" type="submit">
+      <ButtonUI>
         <i class="fas fa-search tm-search-icon" aria-hidden="true"></i>
-      </button>
+      </ButtonUI>
+      <app-link :to="{ name: 'add-book' }">
+        <ButtonUI>
+          <i class="fa-solid fa-plus tm-search-icon" aria-hidden="true"></i>
+        </ButtonUI>
+      </app-link>
     </form>
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+import ButtonUI from "@/components/UI/ButtonUI.vue";
+</script>
 
 <style scoped>
 .search-input {
