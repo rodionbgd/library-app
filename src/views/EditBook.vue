@@ -51,8 +51,8 @@ const store = useStore();
 const router = useRouter();
 const props = defineProps({
   bookId: {
-    type: [Number, undefined],
-    default: undefined,
+    type: Number,
+    required: true,
   },
 });
 

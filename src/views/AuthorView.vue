@@ -1,20 +1,14 @@
 <template>
   <div>
     <router-view />
-    <p>Books by {{ author?.name }}</p>
-    <div class="row tm-row book-list">
-      <BookItem
-        v-for="book in booksByAuthor"
-        :key="book.id"
-        :book="book"
-        routeName="edit-book-author"
-      />
-    </div>
+    <BookList :authorId="props.authorId">
+      <p>Books by {{ author?.name }}</p>
+    </BookList>
   </div>
 </template>
 
 <script setup>
-import BookItem from "@/components/BookItem.vue";
+import BookList from "@/components/BookList.vue";
 import { useStore } from "vuex";
 import { computed } from "vue";
 
@@ -27,9 +21,6 @@ const props = defineProps({
 });
 
 const author = computed(() => store.getters.authorById(props.authorId));
-const booksByAuthor = computed(() =>
-  store.getters.authorBookById(props.authorId)
-);
 </script>
 
 <style scoped></style>

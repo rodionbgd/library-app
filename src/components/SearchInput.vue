@@ -1,18 +1,18 @@
 <template>
   <div class="search-input">
-    <form method="GET" class="form-inline tm-search-form">
+    <form class="form-inline tm-search-form" @submit.prevent="showBookByQuery">
       <input
         class="form-control tm-search-input"
-        name="query"
+        v-model="titleQuery"
         type="text"
         placeholder="Search..."
         aria-label="Search"
       />
-      <ButtonUI>
+      <ButtonUI type="submit">
         <i class="fas fa-search tm-search-icon" aria-hidden="true"></i>
       </ButtonUI>
       <app-link :to="{ name: 'add-book' }">
-        <ButtonUI>
+        <ButtonUI type="button">
           <i class="fa-solid fa-plus tm-search-icon" aria-hidden="true"></i>
         </ButtonUI>
       </app-link>
@@ -22,6 +22,17 @@
 
 <script setup>
 import ButtonUI from "@/components/UI/ButtonUI.vue";
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
+const titleQuery = ref();
+
+const showBookByQuery = () => {
+  router.push({ name: "home", query: { title: titleQuery.value } });
+  titleQuery.value = "";
+};
 </script>
 
 <style scoped>

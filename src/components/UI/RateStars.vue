@@ -1,33 +1,14 @@
 <template>
   <div class="rate-stars-wrapper" :class="{ 'no-pointer-events': !isEditMode }">
     <div class="rating-group">
-      <input
-        disabled
-        checked
-        class="rating__input rating__input--none"
-        name="rating3"
-        value="0"
-        type="radio"
-      />
       <template v-for="star in 5" :key="star">
-        <label
-          :aria-label="`${star} star`"
-          class="rating__label"
-          :for="`rating3-${star}`"
-          ><i
+        <div :aria-label="`${star} star`" class="rating__label">
+          <i
             :class="{ 'rating__icon--star': star <= props.rate }"
-            class="rating__icon no-pointer-events fa fa-star"
-          ></i
-        ></label>
-        <input
-          class="rating__input"
-          name="rating3"
-          type="radio"
-          :id="`rating3-${star}`"
-          :value="`${star}`"
-          :checked="star <= props.rate"
-          @change="updateRate(star)"
-        />
+            class="rating__icon fa fa-star"
+            @click="updateRate(star)"
+          ></i>
+        </div>
       </template>
     </div>
   </div>
@@ -41,7 +22,7 @@ const route = useRoute();
 const props = defineProps({
   rate: {
     type: Number,
-    default: 0,
+    required: true,
   },
 });
 const events = defineEmits({
@@ -66,15 +47,6 @@ const updateRate = (newRate) => {
   pointer-events: none;
 }
 
-.rate-stars-wrapper .rating__input {
-  position: absolute !important;
-  left: -9999px !important;
-}
-
-.rate-stars-wrapper .rating__input--none {
-  display: none;
-}
-
 .rate-stars-wrapper .rating__label {
   cursor: pointer;
   padding: 0 0.1em;
@@ -86,19 +58,12 @@ const updateRate = (newRate) => {
   color: orange;
 }
 
-.rate-stars-wrapper
-  .rating__input:checked
-  ~ .rating__label
-  .rating__icon--star {
+.rate-stars-wrapper ~ .rating__label .rating__icon--star {
   color: #ddd;
 }
 
-.rate-stars-wrapper .rating-group:hover .rating__label .rating__icon--star {
+.rate-stars-wrapper .rating__label:hover .rating__icon--star {
   color: orange;
-}
-
-.rate-stars-wrapper .rating__input:hover ~ .rating__label .rating__icon--star {
-  color: #ddd;
 }
 
 body {

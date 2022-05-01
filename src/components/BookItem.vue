@@ -4,7 +4,7 @@
       <div class="d-flex position-relative edit-bar">
         <app-link
           :to="{
-            name: props.routeName,
+            name: $route.matched[0].children[0].name,
             params: { bookId: props.book.id },
           }"
         >
@@ -63,10 +63,6 @@ const props = defineProps({
       title: "",
       rate: null,
     }),
-  },
-  routeName: {
-    type: String,
-    default: "edit-book",
   },
 });
 
