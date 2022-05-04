@@ -28,7 +28,8 @@
       <RateStars :rate="data.rate" :isEdit="true" @update-rate="updateRate" />
       <ButtonUI
         class="tm-search-icon border border-white"
-        @click.prevent="resetFilter"
+        type="button"
+        @click="resetFilter"
         >reset
       </ButtonUI>
     </div>
@@ -40,7 +41,7 @@
 import RateStars from "@/components/UI/RateStars.vue";
 import ButtonUI from "@/components/UI/ButtonUI.vue";
 
-import { reactive } from "vue";
+import { reactive, watch } from "vue";
 import { useRoute } from "vue-router";
 
 const events = defineEmits({
@@ -74,6 +75,15 @@ const resetFilter = () => {
   });
   updateFilter();
 };
+
+watch(
+  () => route.query,
+  () => {
+    Object.keys(data).forEach((filterKey) => {
+      data[filterKey] = route.query[filterKey];
+    });
+  }
+);
 </script>
 
 <style scoped></style>
