@@ -38,7 +38,8 @@ body {
   overflow-x: hidden;
 }
 
-p {
+p,
+h6 {
   color: #999;
 }
 

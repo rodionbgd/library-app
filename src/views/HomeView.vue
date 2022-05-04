@@ -1,6 +1,9 @@
 <template>
   <BookList>
-    <p>{{ title }}</p>
+    <div v-if="filter.length">
+      <p>Filter</p>
+      <h6 v-for="(item, index) of filter" :key="index">{{ item }}</h6>
+    </div>
   </BookList>
 </template>
 
@@ -10,11 +13,18 @@ import { useRoute } from "vue-router";
 import { computed } from "vue";
 
 const route = useRoute();
-const title = computed(() => {
-  const titleQuery = route.query.title;
-  if (titleQuery) {
-    return `Title contains "${titleQuery}"`;
+const filter = computed(() => {
+  const { title, author, rate } = route.query;
+  let composedFilter = [];
+  if (title) {
+    composedFilter.push(`title: "${title}"`);
   }
-  return "";
+  if (author) {
+    composedFilter.push(`author name: "${author}"`);
+  }
+  if (rate) {
+    composedFilter.push(`rate: ${rate}`);
+  }
+  return composedFilter;
 });
 </script>

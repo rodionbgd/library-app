@@ -1,5 +1,5 @@
 <template>
-  <div class="rate-stars-wrapper" :class="{ 'no-pointer-events': !isEditMode }">
+  <div class="rate-stars-wrapper">
     <div class="rating-group">
       <template v-for="star in 5" :key="star">
         <div :aria-label="`${star} star`" class="rating__label">
@@ -10,27 +10,29 @@
           ></i>
         </div>
       </template>
+      <div
+        v-if="props.isEdit"
+        aria-label="0 star"
+        class="rating__label opacity-25"
+      >
+        <i class="rating__icon fa fa-star" @click="updateRate(0)"></i>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from "vue";
-import { useRoute } from "vue-router";
-
-const route = useRoute();
 const props = defineProps({
   rate: {
     type: Number,
     required: true,
   },
+  isEdit: {
+    type: Boolean,
+  },
 });
 const events = defineEmits({
   "update-rate": null,
-});
-
-const isEditMode = computed(() => {
-  return route.name.includes("edit-book") || route.name.includes("add-book");
 });
 
 const updateRate = (newRate) => {
@@ -43,15 +45,11 @@ const updateRate = (newRate) => {
   display: inline-flex;
 }
 
-.no-pointer-events {
-  pointer-events: none;
-}
-
 .rate-stars-wrapper .rating__label {
   cursor: pointer;
   padding: 0 0.1em;
   font-size: 2rem;
-  color: #ddd;
+  color: whitesmoke;
 }
 
 .rate-stars-wrapper .rating__icon--star {

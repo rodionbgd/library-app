@@ -1,7 +1,10 @@
 <template>
   <div>
     <router-view />
-    <div v-if="filteredBooks.length">
+    <div v-if="!filteredBooks.length && !Object.keys(route.query).length">
+      Loading...
+    </div>
+    <div v-else>
       <div class="position-fixed row tm-row page-nav">
         <div class="tm-prev-next-wrapper">
           <button
@@ -20,7 +23,7 @@
           </button>
         </div>
       </div>
-      <div class="row tm-row book-list tm-mt-4r">
+      <div class="row tm-row tm-mt-4r">
         <slot></slot>
       </div>
       <div class="row tm-row book-list tm-mt-2r">
@@ -32,7 +35,6 @@
         />
       </div>
     </div>
-    <div v-else>Loading...</div>
   </div>
 </template>
 
@@ -42,7 +44,7 @@ import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
 import { computed, onMounted, reactive, watch } from "vue";
 
-const booksPerPage = 6;
+const BOOKS_PER_PAGE = 6;
 const router = useRouter();
 const route = useRoute();
 const store = useStore();
@@ -76,22 +78,35 @@ const books = computed(() => {
 });
 
 const filteredBooks = computed(() => {
-  const titleQuery = route.query.title;
-  if (!titleQuery) {
-    return books.value;
+  let initialBooks = [...books.value];
+  const { title, author, rate } = route.query;
+  if (title) {
+    initialBooks = initialBooks.filter((book) =>
+      book.title.toLowerCase().includes(`${title}`)
+    );
   }
-  return books.value.filter((book) => book.title.includes(titleQuery));
+  if (author) {
+    initialBooks = initialBooks.filter((book) =>
+      book.authors.find((authorItem) =>
+        authorItem.name.toLowerCase().includes(`${author}`)
+      )
+    );
+  }
+  if (rate) {
+    initialBooks = initialBooks.filter((book) => `${book.rate}` === rate);
+  }
+  return initialBooks;
 });
 
 watch(() => route.query.page, updateCurrentPage);
 
 const maxPage = computed(
-  () => Math.ceil(filteredBooks.value.length / booksPerPage) || 1
+  () => Math.ceil(filteredBooks.value.length / BOOKS_PER_PAGE) || 1
 );
 
 const booksCurrentPage = computed(() => {
-  const start = (data.currentPage - 1) * booksPerPage;
-  const end = data.currentPage * booksPerPage;
+  const start = (data.currentPage - 1) * BOOKS_PER_PAGE;
+  const end = data.currentPage * BOOKS_PER_PAGE;
   return [...filteredBooks.value]?.slice(start, end);
 });
 

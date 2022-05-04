@@ -1,0 +1,34 @@
+.scene {
+    width: 1000px;
+    display: flex;
+    justify-content: space-between;
+    perspective: 800px;
+}
+.scene .card-wrapper {
+    position: relative;
+    width: 240px;
+    height: 300px;
+    color: white;
+    cursor: pointer;
+    transition: 1s ease-in-out;
+    transform-style: preserve-3d;
+}
+.scene .card-transform {
+    transform: rotateY(0.5turn);
+}
+.scene .card-wrapper .card__face {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transition: 1s ease-in-out;
+}
+.scene .card-wrapper .card__face img {
+    width: 240px;
+    height: 300px;
+    -o-object-fit: cover;
+    object-fit: cover;
+}

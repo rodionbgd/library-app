@@ -12,15 +12,38 @@
           <h1 class="text-center">Library</h1>
         </div>
       </app-link>
-      <nav class="tm-nav" id="tm-nav">
-        <ul>
-          <MenuItem
-            v-for="item in data.menuItems"
-            :key="item.title"
-            :item="item"
-          />
-        </ul>
-      </nav>
+      <transition name="fade" mode="out-in">
+        <div v-if="!data.toggleMenu">
+          <nav class="tm-nav">
+            <ul>
+              <MenuItem
+                v-for="item in data.menuItems"
+                :key="item.title"
+                :item="item"
+              />
+            </ul>
+          </nav>
+        </div>
+        <div v-else class="d-flex flex-column tm-h-35vh">
+          <BookFilter @update-filter="updateFilter" />
+        </div>
+      </transition>
+      <div class="d-flex justify-content-center">
+        <transition name="fade" mode="out-in">
+          <ButtonUI
+            v-if="!data.toggleMenu"
+            class="tm-search-icon border border-white"
+            @click="data.toggleMenu = !data.toggleMenu"
+            >Filter
+          </ButtonUI>
+          <ButtonUI
+            v-else
+            class="tm-search-icon border border-white"
+            @click="data.toggleMenu = !data.toggleMenu"
+            >Menu
+          </ButtonUI>
+        </transition>
+      </div>
       <div class="d-flex justify-content-center mt-5">
         <app-link
           rel="nofollow"
@@ -37,26 +60,40 @@
 <script setup>
 import { reactive } from "vue";
 import MenuItem from "@/components/MenuItem.vue";
+import ButtonUI from "@/components/UI/ButtonUI.vue";
+import BookFilter from "@/components/BookFilter.vue";
+import { useRoute, useRouter } from "vue-router";
 
+const router = useRouter();
+const route = useRoute();
 const data = reactive({
   menuItems: [
     {
-      title: "Home",
+      title: "Books",
       link: "/",
     },
     {
       title: "Authors",
       link: "/authors",
     },
-    {
-      title: "About",
-      link: "/about",
-    },
   ],
+  toggleMenu: false,
 });
+
+const updateFilter = (filter) => {
+  router.push({
+    ...route,
+    name: "home",
+    query: {
+      ...filter,
+    },
+  });
+};
 </script>
 
 <style scoped>
+@import "@/assets/flipper.css";
+
 .tm-header {
   background-color: #0cc;
   color: white;
@@ -75,7 +112,6 @@ const data = reactive({
   -ms-overflow-style: none;
   padding: 30px;
   width: 100%;
-  /*height: 100%; */
 }
 
 .tm-header-wrapper::-webkit-scrollbar {
@@ -109,7 +145,6 @@ const data = reactive({
   width: 50px;
   height: 50px;
   padding-top: 0.5rem;
-  margin-right: 15px;
   margin-bottom: 15px;
   border-radius: 50%;
 }
