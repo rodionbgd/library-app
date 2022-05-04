@@ -25,17 +25,12 @@ onMounted(() => {
 </script>
 
 <style>
-html {
-  overflow-x: hidden;
-}
-
 body {
   margin: 0;
   padding: 0;
   font-family: "Source Sans Pro", sans-serif;
   font-size: 19px;
   line-height: 2em;
-  overflow-x: hidden;
 }
 
 p,

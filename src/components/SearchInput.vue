@@ -1,6 +1,9 @@
 <template>
-  <div class="search-input">
-    <form class="form-inline tm-search-form" @submit.prevent="showBookByQuery">
+  <div class="search-input-wrapper">
+    <form
+      class="form-inline tm-search-form search-input"
+      @submit.prevent="showBookByQuery"
+    >
       <input
         class="form-control tm-search-input"
         v-model="titleQuery"
@@ -36,14 +39,19 @@ const showBookByQuery = () => {
 </script>
 
 <style scoped>
-.search-input {
+.search-input-wrapper {
   width: 100%;
+  left: 30%;
+  margin-left: 5rem;
   position: fixed;
   z-index: 5;
   background: white;
   display: inline-block;
-  padding-right: 20%;
   padding-top: 1rem;
   padding-bottom: 0.5rem;
+}
+
+.search-input {
+  width: 40%;
 }
 </style>
