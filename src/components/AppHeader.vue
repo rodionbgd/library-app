@@ -13,7 +13,7 @@
         </div>
       </app-link>
       <transition name="fade" mode="out-in">
-        <div v-if="!data.toggleMenu">
+        <div v-if="!data.toggleMenu" class="tm-h-15rem">
           <nav class="tm-nav">
             <ul>
               <MenuItem
@@ -24,7 +24,7 @@
             </ul>
           </nav>
         </div>
-        <div v-else class="d-flex flex-column tm-h-35vh">
+        <div v-else class="d-flex flex-column tm-h-15rem">
           <BookFilter @update-filter="updateFilter" />
         </div>
       </transition>
@@ -71,10 +71,12 @@ const data = reactive({
     {
       title: "Books",
       link: "/",
+      iconClass: "fa-book",
     },
     {
       title: "Authors",
       link: "/authors",
+      iconClass: "fa-feather-pointed",
     },
   ],
   toggleMenu: false,

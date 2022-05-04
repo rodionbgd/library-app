@@ -248,7 +248,7 @@ figcaption { line-height: 1.4; }
 .tm-mr-20 { margin-right: 20px; }
 .tm-ml-0-5 { margin-left: .125rem; }
 .tm-mr-0-5 { margin-right: .125rem; }
-.tm-h-35vh {height: 273px;}
+.tm-h-15rem {min-height: 15rem;}
 .tm-color-primary, spn.tm-color-primary { color: #099; }
 a.tm-color-gray, .tm-color-gray { color: #999; }
 a.tm-color-gray:hover { color: #099; }

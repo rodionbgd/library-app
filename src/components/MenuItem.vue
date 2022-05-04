@@ -1,7 +1,7 @@
 <template>
   <li class="tm-nav-item active">
     <app-link :to="props.item.link" class="tm-nav-link">
-      <i class="fas fa-home"></i>
+      <i class="fas" :class="props.item.iconClass"></i>
       {{ props.item.title }}
     </app-link>
   </li>
