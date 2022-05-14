@@ -8,6 +8,7 @@ module.exports = {
     "eslint:recommended",
     "@vue/eslint-config-prettier"
   ],
+  "plugins": ["jest"],
   rules: {
     "no-console": ["error", { allow: ["warn", "error"] }],
     "no-alert": "error",
@@ -15,6 +16,7 @@ module.exports = {
   "env": {
     "node": true,
     "commonjs": true,
-    "vue/setup-compiler-macros": true
+    "vue/setup-compiler-macros": true,
+    "jest/globals": true,
   },
 }

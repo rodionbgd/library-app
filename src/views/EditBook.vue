@@ -6,6 +6,7 @@
           <form>
             <div class="form-group">
               <p class="modal__title">Title</p>
+              <p data-test="title">test {{ data.title }}</p>
               <input type="text" class="form-control" v-model="data.title" />
               <p class="modal__title">Authors</p>
               <div
@@ -64,13 +65,11 @@ const data = reactive({
   title: "",
   rate: 0,
   newAuthor: "",
-  closeCounter: 0,
-  imgSrc: "",
 });
 
 onMounted(() => {
   document.body.addEventListener("keydown", closeByEsc);
-  data.title = book.value?.title ?? "";
+  data.title = book.value?.title ?? "g";
   data.rate = book.value?.rate ?? 1;
   data.authors = book.value?.authors.map((author) => author.name) ?? [];
 });

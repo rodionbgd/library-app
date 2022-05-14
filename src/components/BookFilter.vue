@@ -50,9 +50,9 @@ const events = defineEmits({
 
 const route = useRoute();
 const data = reactive({
-  title: route.query.title,
-  author: route.query.author,
-  rate: parseInt(`${route.query.rate}`),
+  title: route?.query.title,
+  author: route?.query.author,
+  rate: parseInt(`${route?.query.rate}`),
 });
 
 const updateRate = (newRate) => {
@@ -77,10 +77,10 @@ const resetFilter = () => {
 };
 
 watch(
-  () => route.query,
+  () => route?.query,
   () => {
     Object.keys(data).forEach((filterKey) => {
-      data[filterKey] = route.query[filterKey];
+      data[filterKey] = route?.query[filterKey];
     });
   }
 );
