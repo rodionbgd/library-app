@@ -1,7 +1,10 @@
 <template>
   <div>
     <router-view />
-    <div v-if="!filteredBooks.length && !Object.keys(route.query).length">
+    <div
+      data-test="loading"
+      v-if="!filteredBooks.length && !Object.keys(route.query).length"
+    >
       Loading...
     </div>
     <div v-else>
@@ -15,6 +18,7 @@
             prev
           </button>
           <button
+            data-test="next-page"
             @click="showNext"
             :class="{ disabled: !hasNext }"
             class="mb-2 tm-btn tm-btn-primary tm-prev-next"
@@ -59,7 +63,7 @@ const data = reactive({
 });
 
 const updateCurrentPage = () => {
-  data.currentPage = parseInt(route.query.page ?? 1);
+  data.currentPage = parseInt(route.query?.page ?? 1);
 };
 
 onMounted(() => {
@@ -98,7 +102,7 @@ const filteredBooks = computed(() => {
   return initialBooks;
 });
 
-watch(() => route.query.page, updateCurrentPage);
+watch(() => route.query?.page, updateCurrentPage);
 
 const maxPage = computed(
   () => Math.ceil(filteredBooks.value.length / BOOKS_PER_PAGE) || 1

@@ -6,7 +6,7 @@
           <form>
             <div class="form-group">
               <p class="modal__title">Title</p>
-              <p data-test="title">test {{ data.title }}</p>
+              <p data-test="title">{{ data.title }}</p>
               <input type="text" class="form-control" v-model="data.title" />
               <p class="modal__title">Authors</p>
               <div

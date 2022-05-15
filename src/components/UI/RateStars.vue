@@ -25,7 +25,7 @@
 const props = defineProps({
   rate: {
     type: Number,
-    required: true,
+    default: 0,
   },
   isEdit: {
     type: Boolean,
