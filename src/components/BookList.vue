@@ -83,7 +83,7 @@ const books = computed(() => {
 
 const filteredBooks = computed(() => {
   let initialBooks = [...books.value];
-  const { title, author, rate } = route.query;
+  const { title, author, rate, from, to } = route.query;
   if (title) {
     initialBooks = initialBooks.filter((book) =>
       book.title.toLowerCase().includes(`${title}`)
@@ -97,7 +97,13 @@ const filteredBooks = computed(() => {
     );
   }
   if (rate) {
-    initialBooks = initialBooks.filter((book) => `${book.rate}` === rate);
+    initialBooks = initialBooks.filter((book) => book.rate === +rate);
+  }
+  if (from && !Number.isNaN(from)) {
+    initialBooks = initialBooks.filter((book) => book.price >= +from);
+  }
+  if (to && !Number.isNaN(to)) {
+    initialBooks = initialBooks.filter((book) => book.price <= +to);
   }
   return initialBooks;
 });

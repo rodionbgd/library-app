@@ -38,6 +38,7 @@
           </app-link>
         </div>
         <rate-stars :rate="props.book.rate" />
+        <div class="price">{{ props.book.price }} ₽</div>
         <div class="bookshelf">
           <div v-for="bookshelf in props.book.bookshelves" :key="bookshelf">
             #{{ bookshelf }}
@@ -62,6 +63,7 @@ const props = defineProps({
       bookshelves: [],
       title: "",
       rate: null,
+      price: null,
     }),
   },
 });
@@ -201,5 +203,11 @@ img {
     margin: -4em auto 0;
     vertical-align: top;
   }
+}
+
+.price {
+  font-weight: 700;
+  font-size: 1.5rem;
+  line-height: 2rem;
 }
 </style>

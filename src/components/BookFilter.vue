@@ -24,6 +24,25 @@
         />
       </div>
     </div>
+    <div class="form-group row">
+      <label class="col-sm-2 col-form-label">Price</label>
+      <div class="col-sm-10 d-flex">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="from"
+          v-model.number="data.from"
+          @input="updateFilter"
+        />
+        <input
+          type="text"
+          class="form-control"
+          placeholder="to"
+          v-model.number="data.to"
+          @input="updateFilter"
+        />
+      </div>
+    </div>
     <div class="d-flex justify-content-center mt-3">
       <RateStars :rate="data.rate" :isEdit="true" @update-rate="updateRate" />
       <ButtonUI
@@ -52,6 +71,8 @@ const route = useRoute();
 const data = reactive({
   title: route?.query.title,
   author: route?.query.author,
+  from: parseFloat(`${route?.query.from}`) || null,
+  to: parseFloat(`${route?.query.to}`) || null,
   rate: parseInt(`${route?.query.rate}`),
 });
 

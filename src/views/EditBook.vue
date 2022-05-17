@@ -6,8 +6,19 @@
           <form>
             <div class="form-group">
               <p class="modal__title">Title</p>
-              <p data-test="title">{{ data.title }}</p>
-              <input type="text" class="form-control" v-model="data.title" />
+              <input
+                data-test="title"
+                type="text"
+                class="form-control"
+                v-model="data.title"
+              />
+              <p>Price</p>
+              <input
+                data-test="price"
+                type="text"
+                class="form-control"
+                v-model="data.price"
+              />
               <p class="modal__title">Authors</p>
               <div
                 v-for="(author, authorIndex) of data.authors"
@@ -63,13 +74,15 @@ const book = computed(() =>
 
 const data = reactive({
   title: "",
+  price: "",
   rate: 0,
   newAuthor: "",
 });
 
 onMounted(() => {
   document.body.addEventListener("keydown", closeByEsc);
-  data.title = book.value?.title ?? "g";
+  data.title = book.value?.title;
+  data.price = book.value?.price;
   data.rate = book.value?.rate ?? 1;
   data.authors = book.value?.authors.map((author) => author.name) ?? [];
 });
@@ -96,20 +109,23 @@ const updateAuthorName = (event, authorIndex) => {
 };
 
 const saveBook = () => {
+  if (!data.price || Number.isNaN(+data.price) || !data.title) {
+    return;
+  }
   const authors = [];
   data.authors.forEach((author) => authors.push({ name: author }));
+  const updatedBook = {
+    authors,
+    title: data.title,
+    price: data.price,
+    rate: data.rate,
+  };
   if (!book.value) {
-    store.dispatch("addBook", {
-      authors,
-      title: data.title,
-      rate: data.rate,
-    });
+    store.dispatch("addBook", updatedBook);
   } else {
     store.dispatch("updateBook", {
       ...book.value,
-      authors,
-      title: data.title,
-      rate: data.rate,
+      ...updatedBook,
     });
   }
   close();

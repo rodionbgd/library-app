@@ -12,6 +12,7 @@ export async function getBooks(page = 1) {
     const books = data.results;
     books.forEach((book) => {
       book.rate = Math.ceil(Math.random() * 5);
+      book.price = Math.ceil(Math.random() * 99 + 1);
     });
     return books;
   } catch (e) {

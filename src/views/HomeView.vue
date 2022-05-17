@@ -14,7 +14,7 @@ import { computed } from "vue";
 
 const route = useRoute();
 const filter = computed(() => {
-  const { title, author, rate } = route.query;
+  const { title, author, rate, from, to } = route.query;
   let composedFilter = [];
   if (title) {
     composedFilter.push(`title: "${title}"`);
@@ -24,6 +24,12 @@ const filter = computed(() => {
   }
   if (rate) {
     composedFilter.push(`rate: ${rate}`);
+  }
+  if (from) {
+    composedFilter.push(`price from: ${from}`);
+  }
+  if (to) {
+    composedFilter.push(`price to: ${to}`);
   }
   return composedFilter;
 });
