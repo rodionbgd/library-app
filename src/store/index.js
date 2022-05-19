@@ -105,6 +105,9 @@ const store = createStore({
       commit("REMOVE_BOOK", book);
       commit("GET_AUTHORS");
     },
+    updateAuthors({ commit }) {
+      commit("GET_AUTHORS");
+    },
   },
 });
 

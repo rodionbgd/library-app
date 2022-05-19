@@ -20,23 +20,21 @@
                 v-model="data.price"
               />
               <p class="modal__title">Authors</p>
-              <div
+              <EditAuthor
+                class="d-flex"
                 v-for="(author, authorIndex) of data.authors"
                 :key="authorIndex"
-              >
-                <input
-                  type="text"
-                  class="form-control"
-                  :value="author"
-                  @keyup.enter="updateAuthorName($event, authorIndex)"
-                />
-              </div>
-              <input
-                type="text"
-                class="form-control"
-                placeholder="+Add Author"
-                v-model="data.newAuthor"
-                @keyup.enter="addAuthor"
+                :author="author"
+                :authors="authors"
+                @update-author="
+                  (updatedAuthor) => updateAuthor(updatedAuthor, authorIndex)
+                "
+                @remove-author="removeAuthor(authorIndex)"
+              />
+              <EditAuthor
+                class="d-flex"
+                :authors="authors"
+                @update-author="addAuthor"
               />
             </div>
             <div>
@@ -55,7 +53,9 @@
 
 <script setup>
 import RateStars from "@/components/UI/RateStars.vue";
-import { computed, onBeforeUnmount, onMounted, reactive } from "vue";
+import EditAuthor from "@/components/EditAuthor.vue";
+
+import { computed, onMounted, onUnmounted, reactive } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 
@@ -68,15 +68,11 @@ const props = defineProps({
   },
 });
 
-const book = computed(() =>
-  store.state.books.find((book) => book.id === props.bookId)
-);
-
 const data = reactive({
   title: "",
   price: "",
   rate: 0,
-  newAuthor: "",
+  authors: [],
 });
 
 onMounted(() => {
@@ -84,41 +80,45 @@ onMounted(() => {
   data.title = book.value?.title;
   data.price = book.value?.price;
   data.rate = book.value?.rate ?? 1;
-  data.authors = book.value?.authors.map((author) => author.name) ?? [];
+  data.authors = book.value?.authors ?? [];
 });
 
-onBeforeUnmount(() => {
+onUnmounted(() => {
   document.body.removeEventListener("keydown", closeByEsc);
 });
 
-const addAuthor = () => {
-  if (!data.newAuthor) {
-    return;
+const book = computed(() =>
+  store.state.books.find((book) => book.id === props.bookId)
+);
+
+const authors = computed(() => data.authors.map((author) => author.name));
+
+const updateAuthor = (author, authorIndex) => {
+  if (authorIndex !== undefined) {
+    if (data.authors[authorIndex].name !== author.name) {
+      data.authors[authorIndex] = author;
+      store.dispatch("updateAuthors");
+    }
   }
-  data.authors = [...data.authors, data.newAuthor];
-  data.newAuthor = "";
 };
 
-const updateAuthorName = (event, authorIndex) => {
-  const author = event.target.value;
-  if (!author) {
-    data.authors.splice(authorIndex, 1);
+const removeAuthor = (authorIndex) => {
+  data.authors.splice(authorIndex, 1);
+};
+
+const addAuthor = (newAuthor) => {
+  if (!Object.keys(newAuthor).length) {
     return;
   }
-  data.authors[authorIndex] = author;
+  data.authors = [...data.authors, newAuthor];
 };
 
 const saveBook = () => {
-  if (!data.price || Number.isNaN(+data.price) || !data.title) {
-    return;
-  }
-  const authors = [];
-  data.authors.forEach((author) => authors.push({ name: author }));
+  const { authors, title, rate } = data;
   const updatedBook = {
     authors,
-    title: data.title,
-    price: data.price,
-    rate: data.rate,
+    title,
+    rate,
   };
   if (!book.value) {
     store.dispatch("addBook", updatedBook);
@@ -302,7 +302,7 @@ button::-moz-focus-inner {
 }
 
 .modal__text {
-  padding: 0 4rem;
+  padding: 0 2rem;
   margin-top: 1rem;
 
   font-size: 1.6rem;
