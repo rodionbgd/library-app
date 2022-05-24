@@ -13,4 +13,4 @@ jobs:
           npm install
       - name: Test
         run: |
-          npm test:unit
+          npm run test:unit
