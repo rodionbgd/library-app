@@ -103,8 +103,6 @@ watch(
     Object.keys(data).forEach((filterKey) => {
       data[filterKey] = route?.query[filterKey];
     });
-
-    data.rate = +data.rate;
   }
 );
 </script>

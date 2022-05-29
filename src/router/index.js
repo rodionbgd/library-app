@@ -23,6 +23,10 @@ const routes = [
     path: "/add",
     name: "add-book",
     component: () => import("@/views/EditBook.vue"),
+    props: (route) => ({
+      ...route.params,
+      bookId: parseInt(route.params.bookId),
+    }),
     meta: { transition: "" },
   },
   {

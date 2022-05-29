@@ -20,7 +20,7 @@ import { onMounted } from "vue";
 
 const store = useStore();
 onMounted(() => {
-  store.dispatch("getBooks");
+  store.dispatch("getAuthors");
 });
 </script>
 

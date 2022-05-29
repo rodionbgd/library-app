@@ -14,8 +14,13 @@
       <ButtonUI type="submit">
         <i class="fas fa-search tm-search-icon" aria-hidden="true"></i>
       </ButtonUI>
-      <app-link :to="{ name: 'add-book' }">
-        <ButtonUI type="button">
+      <app-link
+        :to="{
+          name: 'add-book',
+          params: { bookId: store.state.lastBookId + 1 },
+        }"
+      >
+        <ButtonUI type="button" disabled>
           <i class="fa-solid fa-plus tm-search-icon" aria-hidden="true"></i>
         </ButtonUI>
       </app-link>
@@ -27,12 +32,16 @@
 import ButtonUI from "@/components/UI/ButtonUI.vue";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { useStore } from "vuex";
 
 const router = useRouter();
-
+const store = useStore();
 const titleQuery = ref();
 
 const showBookByQuery = () => {
+  if (!titleQuery.value) {
+    return;
+  }
   router.push({ name: "home", query: { title: titleQuery.value } });
   titleQuery.value = "";
 };

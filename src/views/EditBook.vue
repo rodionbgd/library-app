@@ -23,16 +23,17 @@
               <EditAuthor
                 class="d-flex"
                 v-for="(author, authorIndex) of data.authors"
-                :key="authorIndex"
                 :author="author"
                 :authors="authors"
+                :key="author.name"
                 @update-author="
                   (updatedAuthor) => updateAuthor(updatedAuthor, authorIndex)
                 "
-                @remove-author="removeAuthor(authorIndex)"
+                @remove-author="removeAuthor(author.name)"
               />
               <EditAuthor
                 class="d-flex"
+                type="text"
                 :authors="authors"
                 @update-author="addAuthor"
               />
@@ -43,7 +44,14 @@
           </form>
         </div>
         <div class="d-flex justify-content-center mt-2">
-          <button class="modal__btn" @click="saveBook">Save book</button>
+          <button
+            class="modal__btn"
+            @click="saveBook"
+            :class="{ 'opacity-50': !isValidBook }"
+            :disabled="!isValidBook"
+          >
+            Save book
+          </button>
         </div>
         <button class="modal__btn link-2 mt-3rem" @click="close"></button>
       </div>
@@ -55,12 +63,13 @@
 import RateStars from "@/components/UI/RateStars.vue";
 import EditAuthor from "@/components/EditAuthor.vue";
 
-import { computed, onMounted, onUnmounted, reactive } from "vue";
+import { computed, onMounted, onUnmounted, reactive, ref } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 
 const store = useStore();
 const router = useRouter();
+
 const props = defineProps({
   bookId: {
     type: Number,
@@ -68,44 +77,65 @@ const props = defineProps({
   },
 });
 
-const data = reactive({
+const initialBook = {
   title: "",
   price: "",
   rate: 0,
   authors: [],
-});
+};
 
-onMounted(() => {
-  document.body.addEventListener("keydown", closeByEsc);
-  data.title = book.value?.title;
-  data.price = book.value?.price;
-  data.rate = book.value?.rate ?? 1;
-  data.authors = book.value?.authors ?? [];
-});
-
-onUnmounted(() => {
-  document.body.removeEventListener("keydown", closeByEsc);
-});
-
-const book = computed(() =>
-  store.state.books.find((book) => book.id === props.bookId)
+const data = reactive(initialBook);
+const book = computed(
+  () =>
+    store.state.books.find((book) => book.id === props.bookId) ?? initialBook
 );
-
-const authors = computed(() => data.authors.map((author) => author.name));
-
-const updateAuthor = (author, authorIndex) => {
-  if (authorIndex !== undefined) {
-    if (data.authors[authorIndex].name !== author.name) {
-      data.authors[authorIndex] = author;
-      store.dispatch("updateAuthors");
-    }
+const bookSaved = ref(false);
+const setInitialBook = () => {
+  data.title = book.value.title;
+  data.price = book.value.price;
+  data.rate = book.value.rate ?? 1;
+  if (book.value.authors) {
+    data.authors = [...book.value.authors];
   }
 };
 
-const removeAuthor = (authorIndex) => {
-  data.authors.splice(authorIndex, 1);
+const saveBook = () => {
+  const newBook = {
+    authors: data.authors,
+    title: data.title,
+    price: data.price,
+    rate: data.rate,
+  };
+  if (props.bookId > store.state.lastBookId) {
+    store.dispatch("addBook", newBook);
+  } else {
+    store.dispatch("updateBook", {
+      ...book.value,
+      ...newBook,
+    });
+  }
+  bookSaved.value = true;
+  close();
+};
+const isValidBook = computed(() => {
+  return (
+    data.title &&
+    data.price &&
+    !Number.isNaN(+data.price) &&
+    data.authors.length
+  );
+});
+const authors = computed(() => data.authors?.map((author) => author.name));
+
+const updateAuthor = (author, authorIndex) => {
+  if (authorIndex !== undefined) {
+    data.authors[authorIndex] = author;
+  }
 };
 
+const removeAuthor = (name) => {
+  data.authors = data.authors.filter((author) => author.name !== name);
+};
 const addAuthor = (newAuthor) => {
   if (!Object.keys(newAuthor).length) {
     return;
@@ -113,29 +143,23 @@ const addAuthor = (newAuthor) => {
   data.authors = [...data.authors, newAuthor];
 };
 
-const saveBook = () => {
-  const { authors, title, rate } = data;
-  const updatedBook = {
-    authors,
-    title,
-    rate,
-  };
-  if (!book.value) {
-    store.dispatch("addBook", updatedBook);
-  } else {
-    store.dispatch("updateBook", {
-      ...book.value,
-      ...updatedBook,
-    });
-  }
-  close();
-};
-
 const updateRate = (rate) => {
   data.rate = rate;
 };
 
+onMounted(() => {
+  document.body.addEventListener("keydown", closeByEsc);
+  setInitialBook();
+});
+
+onUnmounted(() => {
+  document.body.removeEventListener("keydown", closeByEsc);
+});
+
 const close = () => {
+  if (!bookSaved.value) {
+    setInitialBook();
+  }
   router.back();
 };
 
@@ -181,6 +205,9 @@ body {
   background: var(--global-background);
 }
 
+.opacity-50 {
+  opacity: 0.5;
+}
 button::-moz-focus-inner {
   border: 0;
 }
@@ -302,7 +329,7 @@ button::-moz-focus-inner {
 }
 
 .modal__text {
-  padding: 0 2rem;
+  padding: 0 4rem;
   margin-top: 1rem;
 
   font-size: 1.6rem;

@@ -14,7 +14,7 @@ vi.mock("vue-router", () => ({
   })),
 }));
 
-describe("AppHeader test", () => {
+describe.skip("AppHeader test", () => {
   const getButton = (wrapper) => wrapper.getComponent(ButtonUI);
 
   test("Toggling button", async () => {

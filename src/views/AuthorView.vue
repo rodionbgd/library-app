@@ -2,7 +2,7 @@
   <div>
     <router-view />
     <BookList :authorId="props.authorId">
-      <p>Books by {{ author?.name }}</p>
+      <p>Books by {{ author }}</p>
     </BookList>
   </div>
 </template>
@@ -16,11 +16,12 @@ const store = useStore();
 const props = defineProps({
   authorId: {
     type: Number,
-    required: true,
   },
 });
 
-const author = computed(() => store.getters.authorById(props.authorId));
+const author = computed(() => {
+  return store.getters["authorById"](props.authorId)[0];
+});
 </script>
 
 <style scoped></style>

@@ -9,7 +9,7 @@
     >
       <slot />
     </a>
-    <router-link v-else v-bind="props">
+    <router-link v-else v-bind="props" @keypress.enter.prevent>
       <slot />
     </router-link>
   </div>

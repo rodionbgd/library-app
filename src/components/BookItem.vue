@@ -73,12 +73,11 @@ const events = defineEmits({
 });
 
 const idByAuthorName = (name) => {
-  return store.state.authors?.find((author) => author.name === name)?.id;
+  return store.state.authors[name]?.id;
 };
 
 const removeBook = () => {
   events("remove-book", props.book);
-  store.dispatch("removeBook", props.book);
 };
 </script>
 
@@ -199,7 +198,7 @@ img {
 
 @media (min-width: 600px) {
   .card .image.cover {
-    display: inline-block;
+    /*display: inline-block;*/
     margin: -4em auto 0;
     vertical-align: top;
   }

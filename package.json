@@ -10,8 +10,8 @@
     "cy": "cypress open-ct",
     "cy:ci": "cypress run-ct --quiet --reporter spec",
     "preview": "vite preview --port 5050",
-    "lint": "eslint src --ext .vue,.js,.jsx,.cjs,.mjs --ignore-path .gitignore",
-    "lint:fix": "eslint src --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
+    "lint:fix": "eslint src --ext .vue,.js,.jsx,.cjs,.mjs,.json --fix --ignore-path .gitignore",
+    "lint": "eslint src --ext .vue,.js,.jsx,.cjs,.mjs,.json --ignore-path .gitignore"
   },
   "dependencies": {
     "axios": "^0.27.2",
