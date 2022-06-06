@@ -1,19 +1,21 @@
 <template>
   <li class="tm-nav-item active">
     <app-link :to="props.item.link" class="tm-nav-link">
-      <i class="fas" :class="props.item.iconClass"></i>
+      <font-awesome-icon
+        :icon="props.item.iconClass"
+        aria-hidden="true"
+      ></font-awesome-icon>
       {{ props.item.title }}
     </app-link>
   </li>
 </template>
 
-<script setup>
-const props = defineProps({
-  item: {
-    type: Object,
-    required: true,
-  },
-});
+<script setup lang="ts">
+import type { MenuItemT } from "@/components/AppHeader.vue";
+
+const props = defineProps<{
+  item: MenuItemT;
+}>();
 </script>
 
 <style scoped>

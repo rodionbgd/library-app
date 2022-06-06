@@ -42,22 +42,23 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import BookItem from "@/components/BookItem.vue";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
 import { computed, reactive, watchEffect } from "vue";
+import { AllActionTypes } from "@/store/action-types";
+import type { AuthorObj, Book } from "@/types";
 
 const BOOKS_PER_PAGE = 6;
+
 const router = useRouter();
 const route = useRoute();
 const store = useStore();
 
-const props = defineProps({
-  authorId: {
-    type: Number,
-  },
-});
+const props = defineProps<{
+  authorId?: number;
+}>();
 
 const data = reactive({
   currentPage: 0,
@@ -68,18 +69,18 @@ const updateCurrentPage = () => {
     router.back();
     return;
   }
-  data.currentPage = parseInt(route.query?.page ?? 1);
+  data.currentPage = parseInt(`${route.query?.page ?? 1}`);
 };
 
 const booksByAuthor = computed(() => {
-  return store.getters["authorBookById"](props.authorId);
+  return store.getters.authorBookById(props.authorId);
 });
 
 const books = computed(() => {
   if (props.authorId) {
     return booksByAuthor.value;
   }
-  return store.state.books;
+  return store.state.books.books;
 });
 
 const filteredBooks = computed(() => {
@@ -87,7 +88,7 @@ const filteredBooks = computed(() => {
   const { title, author, rate, from, to } = route.query;
   if (author) {
     const books = new Set();
-    Object.entries(store.state.authors).forEach(([name, a]) => {
+    Object.entries(store.state.authors as AuthorObj).forEach(([name, a]) => {
       if (name.toLowerCase().includes(`${author}`)) {
         a.books.forEach((book) => {
           books.add(book);
@@ -157,8 +158,8 @@ const hasPrev = computed(() => {
   return data.currentPage > 1;
 });
 
-const removeBook = (book) => {
-  store.dispatch("removeBook", book);
+const removeBook = (book: Book) => {
+  store.dispatch(`books/${AllActionTypes.REMOVE_BOOK}`, book);
   if (maxPage.value < data.currentPage) {
     data.currentPage = maxPage.value;
     updateRoute();

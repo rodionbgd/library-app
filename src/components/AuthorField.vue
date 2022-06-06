@@ -18,21 +18,16 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed, nextTick, ref } from "vue";
+import type { AuthorBase } from "@/types";
 
-const props = defineProps({
-  author: {
-    type: Object,
-    required: true,
-  },
-  field: {
-    type: String,
-    required: true,
-  },
-});
+const props = defineProps<{
+  author: AuthorBase;
+  field: keyof AuthorBase;
+}>();
 
-const fieldValue = ref(props.author[props.field]);
+const fieldValue = ref<AuthorBase[keyof AuthorBase]>(props.author[props.field]);
 const emptyDates = computed(
   () => fieldValue.value === "" && props.author.death_year === ""
 );
@@ -65,16 +60,18 @@ const isValid = computed(() => {
   }
 });
 
-const events = defineEmits({
-  "update-field": null,
-});
+type Emits = { (e: "update-field", value: AuthorBase[keyof AuthorBase]): void };
+const events = defineEmits<Emits>();
 
 const isEdited = ref(false);
 
 const editField = () => {
   isEdited.value = true;
   nextTick().then(() => {
-    document.getElementById("author-field").focus();
+    const authorFieldEl = document.getElementById("author-field");
+    if (authorFieldEl) {
+      authorFieldEl.focus();
+    }
   });
 };
 
@@ -87,7 +84,7 @@ const updateValue = () => {
         fieldValue.value !== "" &&
         (props.field === "birth_year" || props.field === "death_year")
       ) {
-        fieldValue.value = parseInt(fieldValue.value);
+        fieldValue.value = parseInt(`${fieldValue.value}`);
       }
       events("update-field", fieldValue.value);
     }

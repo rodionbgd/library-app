@@ -7,20 +7,18 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import BookList from "@/components/BookList.vue";
 import { useStore } from "vuex";
 import { computed } from "vue";
 
 const store = useStore();
-const props = defineProps({
-  authorId: {
-    type: Number,
-  },
-});
+const props = defineProps<{
+  authorId: number;
+}>();
 
 const author = computed(() => {
-  return store.getters["authorById"](props.authorId)[0];
+  return store.getters.authorById(props.authorId)[0];
 });
 </script>
 

@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex">
-    <div class="d-flex mw-100 author-input">
+    <div class="d-flex mw-90 author-input">
       <input
         ref="authorEl"
         type="text"
@@ -15,7 +15,7 @@
         class="form-control author-date"
         placeholder="+Add Birth year"
         :disabled="isDisabledDate"
-        :class="{ error: !isValidValue('birth_year') }"
+        :class="{ error: !isValidBirth }"
         v-model="data.birth_year"
         @keyup.enter="editAuthor"
       />
@@ -24,118 +24,126 @@
         class="form-control author-date"
         placeholder="+Add Death year"
         :disabled="isDisabledDate"
-        :class="{ error: !isValidValue('death_year') }"
+        :class="{ error: !isValidDeath }"
         v-model="data.death_year"
         @keyup.enter="editAuthor"
       />
     </div>
-    <div class="mh-0">
+    <div class="d-flex">
       <button
         type="button"
         class="edit-btn"
-        v-if="Object.keys(props.author).length && props.authors.length > 1"
+        v-if="
+          props.author &&
+          Object.keys(props.author).length &&
+          props.authors.length > 1
+        "
         @click="removeAuthor"
         @keyup.enter.prevent
       >
-        <i class="fa-regular fa-trash-can"></i>
+        -
       </button>
       <button
+        type="button"
         class="edit-btn"
         v-if="isEdited && isValidForm"
         @click="editAuthor"
       >
-        <i class="fa-regular fa-pen-to-square"></i>
+        +
       </button>
     </div>
   </div>
 </template>
 
-<script setup>
-import { computed, reactive, ref, watch } from "vue";
+<script setup lang="ts">
+import { computed, reactive, ref, watch, watchEffect } from "vue";
 import { useStore } from "vuex";
+import type { AuthorBase } from "@/types";
 
-const props = defineProps({
-  author: {
-    type: Object,
-    default: () => ({}),
-  },
-  authors: {
-    type: Array,
-    default: () => [],
-  },
-});
+const props = defineProps<{
+  author?: AuthorBase;
+  authors: string[];
+}>();
 
-const events = defineEmits({
-  "update-author": null,
-  "remove-author": null,
-});
+const events = defineEmits<{
+  (e: "update-author", updatedAuthor: AuthorBase): void;
+  (e: "remove-author"): void;
+}>();
 
 const store = useStore();
 
-const data = reactive({
-  name: props.author.name ?? "",
-  birth_year: props.author.birth_year ?? "",
-  death_year: props.author.death_year ?? "",
+const data = reactive<AuthorBase>({
+  name: props.author?.name ?? "",
+  birth_year: props.author?.birth_year ?? "",
+  death_year: props.author?.death_year ?? "",
 });
 
-const authorEl = ref(null);
+const authorEl = ref<HTMLInputElement>();
+
+const isValidName = ref(true);
+const isValidBirth = ref(true);
+const isValidDeath = ref(true);
+const isDisabledDate = ref(false);
+
+// name
 const isEdited = computed(() => {
   return (
     data.name &&
-    (data.name !== props.author.name ||
-      data.birth_year !== props.author.birth_year ||
-      data.death_year !== props.author.death_year)
+    (data.name !== props.author?.name ||
+      data.birth_year !== props.author?.birth_year ||
+      data.death_year !== props.author?.death_year)
   );
-});
-
-const isValidName = ref(true);
-const isDisabledDate = ref(false);
-const isValidForm = computed(() => {
-  return !Object.keys(data).some((key) => !!isValidValue(key) === false);
 });
 watch(
   () => data.name,
   () => {
-    isValidName.value =
+    isValidName.value = !!(
       (!data.name && !data.birth_year && !data.death_year) ||
-      (data.name && !props.authors.find((author) => author === data.name));
+      (data.name && !props.authors?.find((author) => author === data.name))
+    );
     isDisabledDate.value = false;
     if (
       isValidName.value &&
-      data.name !== props.author.name &&
+      data.name !== props.author?.name &&
       data.name in store.state.authors
     ) {
-      data.birth_year = store.state.authors[data.name].birth_year;
-      data.death_year = store.state.authors[data.name].death_year;
+      data.birth_year = store.state.authors[data.name]?.birth_year;
+      data.death_year = store.state.authors[data.name]?.death_year;
       isDisabledDate.value = true;
     }
   }
 );
 
+// date
+const isNumber = (value: string) => value !== "" && !Number.isNaN(+value);
+
 const emptyDates = computed(
   () => data.birth_year === "" && data.death_year === ""
 );
-const isNumber = (value) => value !== "" && !Number.isNaN(+value);
 
-const isValidValue = (type) => {
+watchEffect(() => {
+  isValidBirth.value =
+    emptyDates.value ||
+    (isNumber(`${data.birth_year}`) &&
+      ((data.death_year !== "" &&
+        (!isNumber(`${data.death_year}`) ||
+          +data.birth_year < data.death_year)) ||
+        data.death_year === ""));
+  isValidDeath.value =
+    (data.birth_year !== "" &&
+      (data.death_year === "" ||
+        (isNumber(`${data.death_year}`) &&
+          +data.death_year >= data.birth_year))) ||
+    emptyDates.value;
+});
+
+// form
+const isValidValue = (type: keyof AuthorBase) => {
   switch (type) {
     case "birth_year":
-      return (
-        emptyDates.value ||
-        (isNumber(data.birth_year) &&
-          ((data.death_year !== "" &&
-            (!isNumber(data.death_year) ||
-              +data.birth_year < data.death_year)) ||
-            data.death_year === ""))
-      );
+      return isValidBirth.value;
     case "death_year":
-      return (
-        (data.birth_year !== "" &&
-          (data.death_year === "" ||
-            (isNumber(+data.death_year) &&
-              data.death_year >= data.birth_year))) ||
-        (data.birth_year === "" && data.death_year === "")
-      );
+      return isValidDeath.value;
     case "name":
       return isValidName.value;
     default:
@@ -143,21 +151,29 @@ const isValidValue = (type) => {
   }
 };
 
+const isValidForm = computed(() => {
+  return !Object.keys(data).some(
+    (key: string) => !isValidValue(key as keyof AuthorBase)
+  );
+});
+
 const editAuthor = () => {
-  if (!isEdited.value) {
+  if (!isEdited.value || !isValidForm.value) {
     return;
   }
 
-  const updatedAuthor = {
+  const updatedAuthor: AuthorBase = {
     name: data.name,
     birth_year: data.birth_year,
     death_year: data.death_year,
   };
   events("update-author", updatedAuthor);
-  if (!Object.keys(props.author).length) {
+  if (props.author && !Object.keys(props.author).length) {
     Object.keys(data).forEach((key) => {
-      data[`${key}`] = "";
-      authorEl.value.focus();
+      data[key as keyof AuthorBase] = "";
+      if (authorEl.value) {
+        authorEl.value.focus();
+      }
     });
   }
 };
@@ -167,12 +183,8 @@ const removeAuthor = () => {
 </script>
 
 <style scoped>
-.mw-100 {
-  min-width: 100%;
-}
-
-.mh-0 {
-  max-height: 0;
+.mw-90 {
+  min-width: 90%;
 }
 
 .author-input {
@@ -192,6 +204,7 @@ const removeAuthor = () => {
 }
 
 .edit-btn {
+  display: block;
   font-size: 1.5rem;
   text-align: center;
   text-decoration: none;

@@ -4,10 +4,10 @@
       <table>
         <thead>
           <tr>
-            <th @click="sortType = 'author'">Author</th>
-            <th @click="sortType = 'birth'">Year of birth</th>
-            <th @click="sortType = 'death'">Year of death</th>
-            <th @click="sortType = 'books'">Books</th>
+            <th @click="sortType = SortType.AUTHOR">Author</th>
+            <th @click="sortType = SortType.BIRTH">Year of birth</th>
+            <th @click="sortType = SortType.DEATH">Year of death</th>
+            <th @click="sortType = SortType.BOOKS">Books</th>
           </tr>
         </thead>
         <tbody>
@@ -60,50 +60,71 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import AuthorField from "@/components/AuthorField.vue";
-
 import { computed, ref } from "vue";
 import { useStore } from "vuex";
+import type { Author, AuthorBase, AuthorObj } from "@/types";
+import { AllActionTypes } from "@/store/action-types";
+
+export type AuthorData = AuthorBase &
+  Author &
+  Omit<Author, "books"> & {
+    field: keyof AuthorBase;
+    value: AuthorBase[keyof AuthorBase];
+  };
+
+enum SortType {
+  AUTHOR = "author",
+  BIRTH = "birth",
+  DEATH = "death",
+  BOOKS = "books",
+}
 
 const store = useStore();
-const authors = computed(() => store.state.authors);
-const sortType = ref("author");
+const authors = computed(() => store.state.authors as AuthorObj);
+const sortType = ref<SortType>(SortType.AUTHOR);
 
-const updateField = (value, author, field) => {
-  author[field] = value;
-  store.dispatch("updateAuthorData", {
+const updateField = (
+  value: AuthorBase[keyof AuthorBase],
+  author: AuthorBase & Author,
+  field: keyof AuthorBase
+) => {
+  author[field] = value as string;
+  store.dispatch(AllActionTypes.UPDATE_AUTHOR_DATA, {
     id: author.id,
     name: author.name,
     field,
     value,
-  });
+  } as AuthorData);
 };
 const sortedAuthors = computed(() => {
-  const authorsEntries = Object.entries(authors.value).map(([key, value]) => ({
-    ...value,
-    name: key,
-  }));
+  const authorsEntries = Object.entries(authors.value).map(
+    ([key, value]: [string, AuthorObj[keyof AuthorObj]]) => ({
+      ...value,
+      name: key,
+    })
+  );
   switch (sortType.value) {
-    case "author":
+    case SortType.AUTHOR:
       return authorsEntries?.sort((author1, author2) =>
         author1.name?.localeCompare(author2.name)
       );
-    case "birth":
+    case SortType.BIRTH:
       return authorsEntries?.sort((author1, author2) => {
-        return author1.birth_year - author2.birth_year;
+        return +author1.birth_year - +author2.birth_year;
       });
-    case "death":
-      return authorsEntries?.sort((author1, author2) => {
+    case SortType.DEATH:
+      return (authorsEntries as AuthorBase[])?.sort((author1, author2) => {
         if (
           typeof author1.death_year === "number" &&
           typeof author2.death_year === "number"
         ) {
           return author1.death_year - author2.death_year;
         }
-        return false;
+        return 0;
       });
-    case "books":
+    case SortType.BOOKS:
       return authorsEntries?.sort((author1, author2) => {
         return author1.books.length - author2.books.length;
       });

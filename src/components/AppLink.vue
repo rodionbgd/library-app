@@ -15,10 +15,11 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { RouterLink } from "vue-router";
 import { computed } from "vue";
 
+// @ts-ignore
 const props = defineProps({ ...RouterLink.props });
 const isExternal = computed(
   () => typeof props.to === "string" && props.to.startsWith("http")

@@ -3,11 +3,12 @@
     <div class="rating-group">
       <template v-for="star in 5" :key="star">
         <div :aria-label="`${star} star`" class="rating__label">
-          <i
+          <font-awesome-icon
+            icon="star"
+            class="rating__icon"
             :class="{ 'rating__icon--star': star <= props.rate }"
-            class="rating__icon fa fa-star"
             @click="updateRate(star)"
-          ></i>
+          ></font-awesome-icon>
         </div>
       </template>
       <div
@@ -15,27 +16,26 @@
         aria-label="0 star"
         class="rating__label opacity-25"
       >
-        <i class="rating__icon fa fa-star" @click="updateRate(0)"></i>
+        <font-awesome-icon
+          class="rating__icon"
+          icon="star"
+          @click="updateRate(0)"
+        ></font-awesome-icon>
       </div>
     </div>
   </div>
 </template>
 
-<script setup>
-const props = defineProps({
-  rate: {
-    type: Number,
-    default: 0,
-  },
-  isEdit: {
-    type: Boolean,
-  },
-});
-const events = defineEmits({
-  "update-rate": null,
-});
+<script setup lang="ts">
+const props = defineProps<{
+  rate?: 0;
+  isEdit?: boolean;
+}>();
+const events = defineEmits<{
+  (e: "update-rate", rate: number): void;
+}>();
 
-const updateRate = (newRate) => {
+const updateRate = (newRate: number) => {
   events("update-rate", newRate);
 };
 </script>

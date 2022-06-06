@@ -12,15 +12,16 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import AppHeader from "@/components/AppHeader.vue";
 import SearchInput from "@/components/SearchInput.vue";
 import { useStore } from "vuex";
 import { onMounted } from "vue";
+import { AllActionTypes } from "@/store/action-types";
 
 const store = useStore();
 onMounted(() => {
-  store.dispatch("getAuthors");
+  store.dispatch(AllActionTypes.GET_AUTHORS);
 });
 </script>
 

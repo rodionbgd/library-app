@@ -1,0 +1,4 @@
+export enum ActionTypes {
+  GET_AUTHORS = "GET_AUTHORS",
+  UPDATE_AUTHOR_DATA = "UPDATE_AUTHOR_DATA",
+}

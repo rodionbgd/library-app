@@ -9,11 +9,11 @@
           }"
         >
           <button class="edit-btn">
-            <i class="fa-regular fa-pen-to-square"></i>
+            <font-awesome-icon icon="pen-to-square"></font-awesome-icon>
           </button>
         </app-link>
         <button class="edit-btn" @click="removeBook">
-          <i class="fa-regular fa-trash-can"></i>
+          <font-awesome-icon icon="trash-can"></font-awesome-icon>
         </button>
       </div>
       <img
@@ -49,30 +49,21 @@
   </section>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import RateStars from "@/components/UI/RateStars.vue";
 import { useStore } from "vuex";
+import type { AuthorObj, Book } from "@/types";
 
 const store = useStore();
-const props = defineProps({
-  book: {
-    type: Object,
-    required: true,
-    default: () => ({
-      authors: [],
-      bookshelves: [],
-      title: "",
-      rate: null,
-      price: null,
-    }),
-  },
-});
+const props = defineProps<{
+  book: Book;
+}>();
 
-const events = defineEmits({
-  "remove-book": null,
-});
+const events = defineEmits<{
+  (e: "remove-book", book: Book): void;
+}>();
 
-const idByAuthorName = (name) => {
+const idByAuthorName = (name: keyof AuthorObj) => {
   return store.state.authors[name]?.id;
 };
 

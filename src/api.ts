@@ -1,4 +1,5 @@
 import axios from "axios";
+import type { Book, AuthorObj } from "@/types";
 
 export async function getAuthors(page = 1) {
   try {
@@ -9,9 +10,9 @@ export async function getAuthors(page = 1) {
       console.error("Unable to fetch data");
     }
     const books = await response.data.results;
-    const authors = {};
+    const authors = {} as AuthorObj;
     let lastId = 1;
-    books.forEach((book) => {
+    books.forEach((book: Book) => {
       book.rate = Math.ceil(Math.random() * 5);
       book.price = Math.ceil(Math.random() * 99 + 1);
       book.authors?.forEach((author) => {
@@ -31,6 +32,6 @@ export async function getAuthors(page = 1) {
     return authors;
   } catch (e) {
     console.error("Unable to fetch data");
-    return [];
+    return {};
   }
 }

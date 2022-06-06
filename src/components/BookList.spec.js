@@ -5,7 +5,6 @@ import { useRoute, useRouter } from "vue-router";
 import { describe, test, expect, vi, beforeEach } from "vitest";
 import { mount } from "@vue/test-utils";
 import store from "@/store";
-// import { getAuthors } from "../api";
 
 const BOOKS_PER_PAGE = 6;
 
@@ -19,22 +18,29 @@ vi.mock("vue-router", () => ({
 }));
 
 vi.mock("@/api", () => {
-  const BOOKS_NUMBER = 50;
-  const books = [];
-  for (let i = 0; i < BOOKS_NUMBER; i += 1) {
-    books.push({
-      title: `title_${i}`,
+  const AUTHORS_NUMBER = 50;
+  const authors = {};
+  for (let i = 0; i < AUTHORS_NUMBER; i += 1) {
+    authors[`author_${i}_0`] = {
       id: i,
-      authors: [{ name: `author_${i}_0` }, { name: `author_${i}_1` }],
-      rate: i % 5,
-    });
+      birth_year: Math.ceil(Math.random() * 2000),
+      death_year: Math.ceil(Math.random() * 2000) + 2000,
+      books: [
+        {
+          title: `title_${i}`,
+          id: i,
+          authors: [{ name: `author_${i}_0` }],
+          rate: i % 5,
+        },
+      ],
+    };
   }
-  return { getAuthors: () => books };
+  return { getAuthors: () => authors };
 });
 
 async function getBookItems(query) {
   const wrapper = getWrapper(query);
-  await store.dispatch("authors/getAuthors");
+  await store.dispatch("getAuthors");
   return wrapper.findAllComponents(BookItem);
 }
 
@@ -62,7 +68,7 @@ describe.skip("BookList test", () => {
   test("Showing books after loading", async () => {
     const getLoadingEl = () => wrapper.find('[data-test="loading"]');
     expect(getLoadingEl().isVisible()).toBeTruthy();
-    await store.dispatch("authors/getAuthors");
+    await store.dispatch("getAuthors");
     expect(getLoadingEl().exists()).toBeFalsy();
   });
   describe("Filtering books", () => {
@@ -102,21 +108,20 @@ describe.skip("BookList test", () => {
       useRouter.mockImplementationOnce(() => ({
         push,
       }));
-      await store.dispatch("authors/getAuthors");
+      await store.dispatch("getAuthors");
     });
     test("Removing books", async () => {
-      const booksNumber = store.state.books.length;
+      const booksNumber = store.state.books.books.length;
       const booksToRemove = booksNumber % BOOKS_PER_PAGE;
       const maxPage = Math.ceil(booksNumber / BOOKS_PER_PAGE);
       const query = { page: maxPage };
       const bookItems = await getBookItems(query);
 
       for (let i = 0; i < booksToRemove; i += 1) {
-        const bookToRemove = store.state.books.at(-1);
+        const bookToRemove = store.state.books.books.at(-1);
         bookItems.at(-1)?.vm.$emit("remove-book", bookToRemove);
-        expect(store.state.books).not.toContain(bookToRemove);
+        expect(store.state.books.books).not.toContain(bookToRemove);
       }
-
       query.page -= 1;
       expect(push).toHaveBeenCalledWith({ query });
     });

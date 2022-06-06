@@ -10,6 +10,7 @@
                 data-test="title"
                 type="text"
                 class="form-control"
+                :class="{ error: !data.title }"
                 v-model="data.title"
               />
               <p>Price</p>
@@ -17,6 +18,7 @@
                 data-test="price"
                 type="text"
                 class="form-control"
+                :class="{ error: !isValidPrice }"
                 v-model="data.price"
               />
               <p class="modal__title">Authors</p>
@@ -35,6 +37,7 @@
                 class="d-flex"
                 type="text"
                 :authors="authors"
+                :author="{}"
                 @update-author="addAuthor"
               />
             </div>
@@ -59,35 +62,37 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import RateStars from "@/components/UI/RateStars.vue";
 import EditAuthor from "@/components/EditAuthor.vue";
 
 import { computed, onMounted, onUnmounted, reactive, ref } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
+import { AllActionTypes } from "@/store/action-types";
+import type { AuthorBase, Book } from "@/types";
 
 const store = useStore();
 const router = useRouter();
 
-const props = defineProps({
-  bookId: {
-    type: Number,
-    required: true,
-  },
-});
+const props = defineProps<{
+  bookId: number;
+}>();
 
 const initialBook = {
+  id: -1,
   title: "",
-  price: "",
+  price: undefined,
   rate: 0,
+  formats: { "image/jpeg": "" },
   authors: [],
 };
 
-const data = reactive(initialBook);
-const book = computed(
+const data = reactive<Book>(initialBook);
+const book = computed<Book>(
   () =>
-    store.state.books.find((book) => book.id === props.bookId) ?? initialBook
+    store.state.books.books.find((book: Book) => book.id === props.bookId) ??
+    initialBook
 );
 const bookSaved = ref(false);
 const setInitialBook = () => {
@@ -106,10 +111,10 @@ const saveBook = () => {
     price: data.price,
     rate: data.rate,
   };
-  if (props.bookId > store.state.lastBookId) {
-    store.dispatch("addBook", newBook);
+  if (props.bookId > store.state.books.lastBookId) {
+    store.dispatch(`books/${AllActionTypes.ADD_BOOK}`, newBook);
   } else {
-    store.dispatch("updateBook", {
+    store.dispatch(`books/${AllActionTypes.UPDATE_BOOK}`, {
       ...book.value,
       ...newBook,
     });
@@ -117,33 +122,33 @@ const saveBook = () => {
   bookSaved.value = true;
   close();
 };
+
+const isValidPrice = computed(() => {
+  return data.price && !Number.isNaN(+data.price);
+});
 const isValidBook = computed(() => {
-  return (
-    data.title &&
-    data.price &&
-    !Number.isNaN(+data.price) &&
-    data.authors.length
-  );
+  return data.title && isValidPrice.value && data.authors.length;
 });
 const authors = computed(() => data.authors?.map((author) => author.name));
 
-const updateAuthor = (author, authorIndex) => {
+const updateAuthor = (author: AuthorBase, authorIndex: number | undefined) => {
   if (authorIndex !== undefined) {
     data.authors[authorIndex] = author;
   }
 };
 
-const removeAuthor = (name) => {
+const removeAuthor = (name: string) => {
   data.authors = data.authors.filter((author) => author.name !== name);
 };
-const addAuthor = (newAuthor) => {
+const addAuthor = (newAuthor: AuthorBase) => {
   if (!Object.keys(newAuthor).length) {
     return;
   }
   data.authors = [...data.authors, newAuthor];
+  data.authors = [...data.authors];
 };
 
-const updateRate = (rate) => {
+const updateRate = (rate: number) => {
   data.rate = rate;
 };
 
@@ -163,7 +168,7 @@ const close = () => {
   router.back();
 };
 
-const closeByEsc = (e) => {
+const closeByEsc = (e: KeyboardEvent) => {
   if (e.code === "Escape") {
     close();
     e.preventDefault();
@@ -208,6 +213,7 @@ body {
 .opacity-50 {
   opacity: 0.5;
 }
+
 button::-moz-focus-inner {
   border: 0;
 }
@@ -305,7 +311,7 @@ button::-moz-focus-inner {
 
 .modal-custom {
   z-index: 15;
-  width: 50%;
+  width: 70%;
   max-height: 90vh;
   padding: 2rem 2rem;
   border-radius: 0.8rem;
@@ -334,5 +340,9 @@ button::-moz-focus-inner {
 
   font-size: 1.6rem;
   line-height: 2;
+}
+
+.error {
+  border: 1px solid red;
 }
 </style>

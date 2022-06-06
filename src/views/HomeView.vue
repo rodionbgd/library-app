@@ -7,7 +7,7 @@
   </BookList>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import BookList from "@/components/BookList.vue";
 import { useRoute } from "vue-router";
 import { computed } from "vue";
@@ -15,7 +15,7 @@ import { computed } from "vue";
 const route = useRoute();
 const filter = computed(() => {
   const { title, author, rate, from, to } = route.query;
-  let composedFilter = [];
+  const composedFilter = [];
   if (title) {
     composedFilter.push(`title: "${title}"`);
   }
