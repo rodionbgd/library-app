@@ -145,7 +145,6 @@ const addAuthor = (newAuthor: AuthorBase) => {
     return;
   }
   data.authors = [...data.authors, newAuthor];
-  data.authors = [...data.authors];
 };
 
 const updateRate = (rate: number) => {

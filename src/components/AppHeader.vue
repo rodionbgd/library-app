@@ -32,13 +32,13 @@
         <transition name="fade" mode="out-in">
           <ButtonUI
             v-if="!data.toggleMenu"
-            class="tm-search-icon border border-white"
+            class="tm-search-icon border border-white px-0"
             @click="data.toggleMenu = !data.toggleMenu"
             >Filter
           </ButtonUI>
           <ButtonUI
             v-else
-            class="tm-search-icon border border-white"
+            class="tm-search-icon border border-white px-0"
             @click="data.toggleMenu = !data.toggleMenu"
             >Menu
           </ButtonUI>

@@ -5,6 +5,8 @@ import store from "@/store";
 
 import App from "@/App.vue";
 import AppLink from "@/components/AppLink.vue";
+import "bootstrap/dist/js/bootstrap.bundle.min";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 import { library } from "@fortawesome/fontawesome-svg-core";
 import {

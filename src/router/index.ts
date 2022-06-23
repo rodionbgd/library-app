@@ -58,7 +58,8 @@ const routes = [
   },
 ];
 
-export const path = process.env.NODE_ENV === "production" ? "/library-app/" : "./";
+export const path =
+  process.env.NODE_ENV === "production" ? "/library-app/" : "./";
 
 const router = createRouter({
   history: createWebHistory(path),

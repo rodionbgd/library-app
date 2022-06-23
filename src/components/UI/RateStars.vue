@@ -6,7 +6,7 @@
           <font-awesome-icon
             icon="star"
             class="rating__icon"
-            :class="{ 'rating__icon--star': star <= props.rate }"
+            :class="{ 'rating__icon--star': star <= +props.rate }"
             @click="updateRate(star)"
           ></font-awesome-icon>
         </div>
@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
 const props = defineProps<{
-  rate?: 0;
+  rate?: "";
   isEdit?: boolean;
 }>();
 const events = defineEmits<{

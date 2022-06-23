@@ -65,11 +65,12 @@ import { useRoute } from "vue-router";
 import type { LocationQuery } from "vue-router";
 
 export type Filter = {
-  title: LocationQuery[0];
-  author: LocationQuery[0];
-  from: LocationQuery[0];
-  to: LocationQuery[0];
-  rate: LocationQuery[0];
+  title?: LocationQuery[0];
+  author?: LocationQuery[0];
+  from?: LocationQuery[0];
+  to?: LocationQuery[0];
+  rate?: LocationQuery[0];
+  page?: LocationQuery[0];
 };
 
 const events = defineEmits<{
