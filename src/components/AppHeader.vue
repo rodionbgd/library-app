@@ -32,13 +32,13 @@
         <transition name="fade" mode="out-in">
           <ButtonUI
             v-if="!data.toggleMenu"
-            class="tm-search-icon border border-white"
+            class="tm-search-icon border border-white px-0"
             @click="data.toggleMenu = !data.toggleMenu"
             >Filter
           </ButtonUI>
           <ButtonUI
             v-else
-            class="tm-search-icon border border-white"
+            class="tm-search-icon border border-white px-0"
             @click="data.toggleMenu = !data.toggleMenu"
             >Menu
           </ButtonUI>
@@ -50,39 +50,56 @@
           to="https://github.com/rodionbgd"
           class="tm-social-link"
         >
-          <i class="fa-brands fa-github tm-social-icon"></i>
+          <font-awesome-icon
+            class="tm-social-icon"
+            :icon="['fab', 'github']"
+          ></font-awesome-icon>
         </app-link>
       </div>
     </div>
   </header>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { reactive } from "vue";
-import MenuItem from "@/components/MenuItem.vue";
+import { useRoute, useRouter } from "vue-router";
+
 import ButtonUI from "@/components/UI/ButtonUI.vue";
 import BookFilter from "@/components/BookFilter.vue";
-import { useRoute, useRouter } from "vue-router";
+import MenuItem from "@/components/MenuItem.vue";
+
+import type { Filter } from "@/components/BookFilter.vue";
+
+type Data = {
+  menuItems: MenuItemT[];
+  toggleMenu: boolean;
+};
+
+export type MenuItemT = {
+  title: string;
+  link: string;
+  iconClass: string;
+};
 
 const router = useRouter();
 const route = useRoute();
-const data = reactive({
+const data = reactive<Data>({
   menuItems: [
     {
       title: "Books",
       link: "/",
-      iconClass: "fa-book",
+      iconClass: "book",
     },
     {
       title: "Authors",
       link: "/authors",
-      iconClass: "fa-feather-pointed",
+      iconClass: "feather-pointed",
     },
   ],
   toggleMenu: false,
 });
 
-const updateFilter = (filter) => {
+const updateFilter = (filter: Filter) => {
   router.push({
     ...route,
     name: "home",

@@ -2,9 +2,14 @@ import BookItem from "@/components/BookItem.vue";
 import BookList from "@/components/BookList.vue";
 
 import { useRoute, useRouter } from "vue-router";
+
 import { describe, test, expect, vi, beforeEach } from "vitest";
+import type { SpyInstance, SpyInstanceFn } from "vitest";
 import { mount } from "@vue/test-utils";
 import store from "@/store";
+import { AllActionTypes } from "@/store/action-types";
+import type { AuthorBase, AuthorObj } from "@/types";
+import type Filter from "@/components/BookFilter.vue";
 
 const BOOKS_PER_PAGE = 6;
 
@@ -18,27 +23,36 @@ vi.mock("vue-router", () => ({
 }));
 
 vi.mock("@/api", () => {
-  const BOOKS_NUMBER = 50;
-  const books = [];
-  for (let i = 0; i < BOOKS_NUMBER; i += 1) {
-    books.push({
-      title: `title_${i}`,
+  const AUTHORS_NUMBER = 50;
+  const authors: AuthorObj = {};
+  for (let i = 0; i < AUTHORS_NUMBER; i += 1) {
+    authors[`author_${i}_0`] = {
       id: i,
-      authors: [{ name: `author_${i}_0` }, { name: `author_${i}_1` }],
-      rate: i % 5,
-    });
+      birth_year: Math.ceil(Math.random() * 2000),
+      death_year: Math.ceil(Math.random() * 2000) + 2000,
+      books: [
+        {
+          title: `title_${i}`,
+          id: i,
+          authors: [{ name: `author_${i}_0`, birth_year: "", death_year: "" }],
+          rate: i % 5,
+          formats: { "image/jpeg": "" },
+          price: 0,
+        },
+      ],
+    };
   }
-  return { getBooks: () => books };
+  return { getAuthors: () => authors };
 });
 
-async function getBookItems(query) {
+async function getBookItems(query: Filter) {
   const wrapper = getWrapper(query);
-  await store.dispatch("getBooks");
+  await store.dispatch(AllActionTypes.GET_AUTHORS);
   return wrapper.findAllComponents(BookItem);
 }
 
-function getWrapper(query) {
-  useRoute.mockImplementationOnce(() => ({
+function getWrapper(query: Filter) {
+  (useRoute as unknown as SpyInstance).mockImplementationOnce(() => ({
     query,
   }));
   return mount(BookList, {
@@ -47,6 +61,7 @@ function getWrapper(query) {
       stubs: {
         AppLink: true,
         BookItem: true,
+        FontAwesomeIcon: true,
         "router-view": true,
       },
     },
@@ -54,14 +69,14 @@ function getWrapper(query) {
 }
 
 describe("BookList test", () => {
-  let wrapper;
+  let wrapper: ReturnType<typeof getWrapper>;
   beforeEach(() => {
     wrapper = getWrapper({});
   });
   test("Showing books after loading", async () => {
     const getLoadingEl = () => wrapper.find('[data-test="loading"]');
     expect(getLoadingEl().isVisible()).toBeTruthy();
-    await store.dispatch("getBooks");
+    await store.dispatch(AllActionTypes.GET_AUTHORS);
     expect(getLoadingEl().exists()).toBeFalsy();
   });
   describe("Filtering books", () => {
@@ -70,7 +85,7 @@ describe("BookList test", () => {
       const bookItems = await getBookItems(query);
       bookItems.forEach((book) => {
         expect(book.vm.$props.book.title.toLowerCase()).toContain(
-          query.title.toLowerCase()
+          `${query.title}`.toLowerCase()
         );
       });
     });
@@ -78,8 +93,8 @@ describe("BookList test", () => {
       const query = { author: "3" };
       const bookItems = await getBookItems(query);
       bookItems.forEach((book) => {
-        const authors = book.vm.$props.book.authors.map((author) =>
-          author.name.toLowerCase()
+        const authors = (book.vm.$props.book.authors as AuthorBase[]).map(
+          (author) => author.name.toLowerCase()
         );
         expect(
           authors.find((author) => author.includes(query.author))
@@ -87,45 +102,51 @@ describe("BookList test", () => {
       });
     });
     test("Filtering books by rate", async () => {
-      const query = { rate: "4" };
+      const query: Filter = { rate: "4" };
       const bookItems = await getBookItems(query);
       bookItems.forEach((book) => {
-        expect(`${book.vm.$props.book.rate}`).toBe(query.rate);
+        expect(book.vm.$props.book.rate).toBe(parseInt(`${query.rate}`));
       });
     });
   });
   describe("Updating routes", () => {
-    let push;
+    let push: SpyInstanceFn;
     beforeEach(async () => {
       push = vi.fn();
-      useRouter.mockImplementationOnce(() => ({
+      (useRouter as unknown as SpyInstance).mockImplementationOnce(() => ({
         push,
       }));
-      await store.dispatch("getBooks");
+      await store.dispatch(AllActionTypes.GET_AUTHORS);
     });
     test("Removing books", async () => {
-      const booksNumber = store.state.books.length;
+      if (!store.state.books) {
+        return;
+      }
+      const booksNumber = store.state.books.books.length;
       const booksToRemove = booksNumber % BOOKS_PER_PAGE;
       const maxPage = Math.ceil(booksNumber / BOOKS_PER_PAGE);
-      const query = { page: maxPage };
+      const query: Filter = { page: `${maxPage}` };
       const bookItems = await getBookItems(query);
 
       for (let i = 0; i < booksToRemove; i += 1) {
-        const bookToRemove = store.state.books.at(-1);
+        const bookToRemove = store.state.books.books.at(-1);
         bookItems.at(-1)?.vm.$emit("remove-book", bookToRemove);
-        expect(store.state.books).not.toContain(bookToRemove);
+        expect(store.state.books.books).not.toContain(bookToRemove);
       }
-
-      query.page -= 1;
+      if (query.page !== undefined) {
+        query.page = (parseInt(`${query.page}`) - 1) as unknown as string;
+      }
       expect(push).toHaveBeenCalledWith({ query });
     });
 
     test("Updating route", async () => {
-      const query = { page: 1 };
+      const query: Filter = { page: "1" };
       wrapper = getWrapper(query);
       const nextPageBtn = wrapper.get('[data-test="next-page"]');
       await nextPageBtn.trigger("click");
-      query.page += 1;
+      if (query.page !== undefined) {
+        query.page = (parseInt(`${query.page}`) + 1) as unknown as string;
+      }
       expect(push).toHaveBeenCalledTimes(1);
       expect(push).toHaveBeenCalledWith({ query });
     });

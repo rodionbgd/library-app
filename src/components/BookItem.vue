@@ -9,11 +9,11 @@
           }"
         >
           <button class="edit-btn">
-            <i class="fa-regular fa-pen-to-square"></i>
+            <font-awesome-icon icon="pen-to-square"></font-awesome-icon>
           </button>
         </app-link>
         <button class="edit-btn" @click="removeBook">
-          <i class="fa-regular fa-trash-can"></i>
+          <font-awesome-icon icon="trash-can"></font-awesome-icon>
         </button>
       </div>
       <img
@@ -49,36 +49,26 @@
   </section>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import RateStars from "@/components/UI/RateStars.vue";
 import { useStore } from "vuex";
+import type { AuthorObj, Book } from "@/types";
 
 const store = useStore();
-const props = defineProps({
-  book: {
-    type: Object,
-    required: true,
-    default: () => ({
-      authors: [],
-      bookshelves: [],
-      title: "",
-      rate: null,
-      price: null,
-    }),
-  },
-});
+const props = defineProps<{
+  book: Book;
+}>();
 
-const events = defineEmits({
-  "remove-book": null,
-});
+const events = defineEmits<{
+  (e: "remove-book", book: Book): void;
+}>();
 
-const idByAuthorName = (name) => {
-  return store.state.authors?.find((author) => author.name === name)?.id;
+const idByAuthorName = (name: keyof AuthorObj) => {
+  return store.state.authors[name]?.id;
 };
 
 const removeBook = () => {
   events("remove-book", props.book);
-  store.dispatch("removeBook", props.book);
 };
 </script>
 
@@ -199,7 +189,7 @@ img {
 
 @media (min-width: 600px) {
   .card .image.cover {
-    display: inline-block;
+    /*display: inline-block;*/
     margin: -4em auto 0;
     vertical-align: top;
   }

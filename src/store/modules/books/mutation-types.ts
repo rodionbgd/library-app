@@ -1,0 +1,6 @@
+export enum MutationTypes {
+  GET_BOOKS = "GET_BOOKS",
+  GET_LAST_BOOK_ID = "GET_LAST_BOOK_ID",
+  UPDATE_BOOK = "UPDATE_BOOK",
+  REMOVE_BOOK = "REMOVE_BOOK",
+}

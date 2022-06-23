@@ -1,9 +1,11 @@
 import BookFilter from "@/components/BookFilter.vue";
+import type Filter from "@/components/BookFilter.vue";
 import ButtonUI from "@/components/UI/ButtonUI.vue";
 
 import { describe, test, expect, vi, beforeEach } from "vitest";
+import type { SpyInstance } from "vitest";
 
-import { mount } from "@vue/test-utils";
+import { mount, VueWrapper } from "@vue/test-utils";
 import { useRoute } from "vue-router";
 
 vi.mock("vue-router", () => ({
@@ -11,29 +13,37 @@ vi.mock("vue-router", () => ({
 }));
 
 describe("Filtering books", () => {
-  let wrapper;
-  const filter = {
+  let wrapper: VueWrapper;
+  const filter: Filter = {
     title: "Kingdom",
     author: "Charles",
-    rate: 4,
+    rate: "4",
   };
 
   beforeEach(() => {
-    useRoute.mockImplementationOnce(() => ({
+    (useRoute as unknown as SpyInstance).mockImplementationOnce(() => ({
       query: filter,
     }));
-    wrapper = mount(BookFilter);
+    wrapper = mount(BookFilter, {
+      global: {
+        stubs: {
+          FontAwesomeIcon: true,
+        },
+      },
+    });
   });
 
   test("Updating filter", async () => {
     const getAuthor = () => wrapper.get("#author-filter");
     await getAuthor().trigger("input");
-    expect(wrapper.emitted("update-filter")[0][0]).toStrictEqual(filter);
+    expect((wrapper.emitted("update-filter") as string[])[0][0]).toStrictEqual(
+      filter
+    );
   });
   test("Resetting filter", async () => {
     const getTitle = () => wrapper.get("#title-filter");
-    expect(getTitle().element.value).toBe(filter.title);
+    expect((<HTMLInputElement>getTitle().element).value).toBe(filter.title);
     await wrapper.getComponent(ButtonUI).trigger("click.prevent");
-    expect(getTitle().element.value).toBeFalsy();
+    expect((<HTMLInputElement>getTitle().element).value).toBeFalsy();
   });
 });

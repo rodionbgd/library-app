@@ -42,58 +42,64 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import BookItem from "@/components/BookItem.vue";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
-import { computed, onMounted, reactive, watch } from "vue";
+import { computed, reactive, watchEffect } from "vue";
+import { AllActionTypes } from "@/store/action-types";
+import type { AuthorObj, Book } from "@/types";
 
 const BOOKS_PER_PAGE = 6;
+
 const router = useRouter();
 const route = useRoute();
 const store = useStore();
 
-const props = defineProps({
-  authorId: {
-    type: Number,
-  },
-});
+const props = defineProps<{
+  authorId?: number;
+}>();
+
 const data = reactive({
   currentPage: 0,
 });
 
 const updateCurrentPage = () => {
-  data.currentPage = parseInt(route.query?.page ?? 1);
+  if (props.authorId && !booksByAuthor.value.length) {
+    router.back();
+    return;
+  }
+  data.currentPage = parseInt(`${route.query?.page ?? 1}`);
 };
 
-onMounted(() => {
-  updateCurrentPage();
+const booksByAuthor = computed(() => {
+  return store.getters.authorBookById(props.authorId);
 });
-
-const booksByAuthor = computed(() =>
-  store.getters.authorBookById(props.authorId)
-);
 
 const books = computed(() => {
   if (props.authorId) {
     return booksByAuthor.value;
   }
-  return store.state.books;
+  return store.state.books.books;
 });
 
 const filteredBooks = computed(() => {
   let initialBooks = [...books.value];
   const { title, author, rate, from, to } = route.query;
+  if (author) {
+    const books = new Set();
+    Object.entries(store.state.authors as AuthorObj).forEach(([name, a]) => {
+      if (name.toLowerCase().includes(`${author}`)) {
+        a.books.forEach((book) => {
+          books.add(book);
+        });
+      }
+    });
+    initialBooks = [...books];
+  }
   if (title) {
     initialBooks = initialBooks.filter((book) =>
       book.title.toLowerCase().includes(`${title}`)
-    );
-  }
-  if (author) {
-    initialBooks = initialBooks.filter((book) =>
-      book.authors.find((authorItem) =>
-        authorItem.name.toLowerCase().includes(`${author}`)
-      )
     );
   }
   if (rate) {
@@ -108,7 +114,7 @@ const filteredBooks = computed(() => {
   return initialBooks;
 });
 
-watch(() => route.query?.page, updateCurrentPage);
+watchEffect(updateCurrentPage);
 
 const maxPage = computed(
   () => Math.ceil(filteredBooks.value.length / BOOKS_PER_PAGE) || 1
@@ -152,8 +158,8 @@ const hasPrev = computed(() => {
   return data.currentPage > 1;
 });
 
-const removeBook = (book) => {
-  store.dispatch("removeBook", book);
+const removeBook = (book: Book) => {
+  store.dispatch(`books/${AllActionTypes.REMOVE_BOOK}`, book);
   if (maxPage.value < data.currentPage) {
     data.currentPage = maxPage.value;
     updateRoute();
@@ -168,7 +174,7 @@ const removeBook = (book) => {
   display: flex;
   justify-content: flex-start;
   background: white;
-  z-index: 5;
+  z-index: 4;
   padding-top: 1rem;
 }
 </style>

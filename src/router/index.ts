@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import type { RouteLocation } from "vue-router";
 import HomeView from "@/views/HomeView.vue";
 
 const routes = [
@@ -12,9 +13,9 @@ const routes = [
         path: "edit/:bookId",
         name: "edit-book",
         component: () => import("@/views/EditBook.vue"),
-        props: (route) => ({
+        props: (route: RouteLocation) => ({
           ...route.params,
-          bookId: parseInt(route.params.bookId),
+          bookId: parseInt(`${route.params.bookId}`),
         }),
       },
     ],
@@ -23,6 +24,10 @@ const routes = [
     path: "/add",
     name: "add-book",
     component: () => import("@/views/EditBook.vue"),
+    props: (route: RouteLocation) => ({
+      ...route.params,
+      bookId: parseInt(`${route.params.bookId}`),
+    }),
     meta: { transition: "" },
   },
   {
@@ -34,9 +39,9 @@ const routes = [
     path: "/author/:authorId",
     name: "author",
     component: () => import("@/views/AuthorView.vue"),
-    props: (route) => ({
+    props: (route: RouteLocation) => ({
       ...route.params,
-      authorId: parseInt(route.params.authorId),
+      authorId: parseInt(`${route.params.authorId}`),
     }),
     meta: { transition: "" },
     children: [
@@ -44,9 +49,9 @@ const routes = [
         path: "edit/:bookId",
         name: "edit-book-author",
         component: () => import("@/views/EditBook.vue"),
-        props: (route) => ({
+        props: (route: RouteLocation) => ({
           ...route.params,
-          bookId: parseInt(route.params.bookId),
+          bookId: parseInt(`${route.params.bookId}`),
         }),
       },
     ],
@@ -68,7 +73,7 @@ const router = createRouter({
       return new Promise((resolve) =>
         setTimeout(() => resolve({ top: 0, behavior: "smooth" }), 200)
       );
-    return savedPosition;
+    return savedPosition || undefined;
   },
 });
 

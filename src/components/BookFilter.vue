@@ -56,43 +56,55 @@
   </form>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import RateStars from "@/components/UI/RateStars.vue";
 import ButtonUI from "@/components/UI/ButtonUI.vue";
 
 import { reactive, watch } from "vue";
 import { useRoute } from "vue-router";
+import type { LocationQuery } from "vue-router";
 
-const events = defineEmits({
-  "update-filter": null,
-});
+export type Filter = {
+  title?: LocationQuery[0];
+  author?: LocationQuery[0];
+  from?: LocationQuery[0];
+  to?: LocationQuery[0];
+  rate?: LocationQuery[0];
+  page?: LocationQuery[0];
+};
+
+const events = defineEmits<{
+  (e: "update-filter", filter: Filter): void;
+}>();
 
 const route = useRoute();
-const data = reactive({
+const data = reactive<Filter>({
   title: route?.query.title,
   author: route?.query.author,
-  from: parseFloat(`${route?.query.from}`) || null,
-  to: parseFloat(`${route?.query.to}`) || null,
-  rate: parseInt(`${route?.query.rate}`),
+  from: route?.query?.from ? `${parseFloat(`${route?.query?.from}`)}` : null,
+  to: route?.query?.to ? `${parseFloat(`${route?.query?.to}`)}` : null,
+  rate: route?.query.rate ? `${parseInt(`${route?.query.rate}`)}` : null,
 });
 
-const updateRate = (newRate) => {
+const updateRate = (newRate: Filter["rate"]) => {
   data.rate = newRate;
   updateFilter();
 };
 const updateFilter = () => {
-  const filter = {};
-  Object.entries(data).forEach(([key, value]) => {
-    if (value) {
-      filter[key] = value;
+  const filter = {} as Filter;
+  Object.entries(data).forEach(
+    ([key, value]: [string, Filter[keyof Filter]]) => {
+      if (value) {
+        filter[key as keyof Filter] = value;
+      }
     }
-  });
+  );
   events("update-filter", filter);
 };
 
 const resetFilter = () => {
-  Object.keys(data).forEach((filterKey) => {
-    data[filterKey] = null;
+  Object.keys(data).forEach((filterKey: string) => {
+    data[filterKey as keyof Filter] = "";
   });
   updateFilter();
 };
@@ -100,11 +112,11 @@ const resetFilter = () => {
 watch(
   () => route?.query,
   () => {
-    Object.keys(data).forEach((filterKey) => {
-      data[filterKey] = route?.query[filterKey];
+    Object.keys(data).forEach((filterKey: string) => {
+      data[filterKey as keyof Filter] = route?.query[
+        filterKey
+      ] as LocationQuery[0] & number;
     });
-
-    data.rate = +data.rate;
   }
 );
 </script>

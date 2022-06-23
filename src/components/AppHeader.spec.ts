@@ -5,7 +5,8 @@ import BookFilter from "@/components/BookFilter.vue";
 
 import { useRoute, useRouter } from "vue-router";
 import { describe, test, expect, vi } from "vitest";
-import { mount } from "@vue/test-utils";
+import type { SpyInstance } from "vitest";
+import { mount, VueWrapper } from "@vue/test-utils";
 
 vi.mock("vue-router", () => ({
   useRoute: vi.fn(),
@@ -14,18 +15,23 @@ vi.mock("vue-router", () => ({
   })),
 }));
 
+function getWrapper() {
+  return mount(AppHeader, {
+    global: {
+      stubs: {
+        AppLink: true,
+        BookFilter: true,
+        FontAwesomeIcon: true,
+      },
+    },
+  });
+}
+
 describe("AppHeader test", () => {
-  const getButton = (wrapper) => wrapper.getComponent(ButtonUI);
+  const getButton = (wrapper: VueWrapper) => wrapper.getComponent(ButtonUI);
 
   test("Toggling button", async () => {
-    const wrapper = mount(AppHeader, {
-      global: {
-        stubs: {
-          AppLink: true,
-          BookFilter: true,
-        },
-      },
-    });
+    const wrapper = getWrapper();
 
     const getMenuItem = () => wrapper.getComponent(MenuItem);
 
@@ -45,20 +51,14 @@ describe("AppHeader test", () => {
         author: "Charles",
       },
     };
-    useRoute.mockImplementationOnce(() => ({
+    (useRoute as unknown as SpyInstance).mockImplementationOnce(() => ({
       query: route.query,
     }));
     const push = vi.fn();
-    useRouter.mockImplementationOnce(() => ({
+    (useRouter as unknown as SpyInstance).mockImplementationOnce(() => ({
       push,
     }));
-    const wrapper = mount(AppHeader, {
-      global: {
-        stubs: {
-          AppLink: true,
-        },
-      },
-    });
+    const wrapper = getWrapper();
 
     await getButton(wrapper).trigger("click");
     const getBookFilter = () => wrapper.getComponent(BookFilter);
